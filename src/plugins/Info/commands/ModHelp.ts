@@ -1,0 +1,89 @@
+import { EmbedHelper, Message, BasePlugin, BaseCommand, Logger } from "framed.js";
+import { oneLine } from "common-tags";
+import { HelpData } from "framed.js";
+
+const data: HelpData[] = [
+	{
+		group: "Info",
+		commands: ["info", "server"],
+	},
+	{
+		group: "Manage",
+		commands: [
+			"command add",
+			"command edit",
+			"command delete",
+			"command list",
+			"group add",
+			"group edit",
+			"group delete",
+			"group list",
+		],
+	},
+	{
+		group: "Markdown",
+		commands: ["channel", "emoji", "user", "role", "raw"],
+	},
+	{
+		group: "Utilities",
+		commands: ["avatar", "link", "multi", "render"],
+	},
+	{
+		group: "Dailies",
+		commands: ["bumpstreak", "setmercies", "setstreak"],
+	},
+];
+
+export default class extends BaseCommand {
+	constructor(plugin: BasePlugin) {
+		super(plugin, {
+			id: "modhelp",
+			aliases: ["modh", "mh"],
+			about: "View help for mod commands.",
+		});
+	}
+
+	async run(msg: Message): Promise<boolean> {
+		return this.showHelpAll(msg);
+	}
+
+	private async showHelpAll(msg: Message): Promise<boolean> {
+		const helpFields = await this.client.plugins.createHelpFields(data);
+
+		if (msg.discord && helpFields) {
+			let modRoleString = msg.discord.guild?.roles.cache
+				.find(role => role.name == "Mods")
+				?.toString();
+			if (!modRoleString) {
+				modRoleString = "<@&462342299171684364>";
+			}
+
+			let communitySupportRole = msg.discord.guild?.roles.cache
+				.find(role => role.name == "Community Support")
+				?.toString();
+			if (!communitySupportRole) {
+				communitySupportRole = "<@&758771336289583125>";
+			}
+
+			const embed = EmbedHelper.getTemplate(msg.discord, this.client.helpCommands, this.id)
+				.setTitle("Mod Command Help")
+				.setDescription(
+					oneLine`
+						These are commands designed mostly for
+						${modRoleString} and ${communitySupportRole} only.`
+				)
+				.addFields(helpFields);
+
+			try {
+				await msg.discord.channel.send(embed);
+			} catch (error) {
+				await msg.discord.channel.send(
+					`${msg.discord.author}, the embed size for help is too large! Contact one of the bot masters`
+				);
+				Logger.error(error.stack);
+			}
+			return true;
+		}
+		return false;
+	}
+}

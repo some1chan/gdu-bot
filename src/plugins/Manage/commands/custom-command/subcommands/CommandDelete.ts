@@ -1,0 +1,135 @@
+import { Logger, Message, PluginManager } from "framed.js";
+import { BaseCommand } from "framed.js";
+import { BaseSubcommand } from "framed.js";
+import CustomCommand from "../CustomCommand";
+
+export default class extends BaseSubcommand {
+	constructor(command: BaseCommand) {
+		super(command, {
+			id: "delete",
+			aliases: ["del", "d", "remove", "rm"],
+			about: "Deletes a custom command.",
+			examples: `\`{{prefix}}command {{id}} newcommand\``,
+			hideUsageInHelp: true,
+		});
+	}
+
+	async run(msg: Message): Promise<boolean> {
+		// Checks for permission
+		if (!this.hasPermission(msg)) {
+			this.sendPermissionErrorMessage(msg);
+			return false;
+		}
+
+		if (msg.command && msg.args && msg.prefix && msg.args.length > 0) {
+			const parse = CustomCommand.customParse(
+				msg.prefix,
+				msg.command,
+				msg.content,
+				msg.args
+			);
+			if (parse) {
+				const { newCommandId } = parse;
+				return (
+					(await this.deleteCommand(newCommandId, msg)) != undefined
+				);
+			}
+		}
+
+		await PluginManager.sendHelpForCommand(msg);
+		return false;
+	}
+
+	/**
+	 * Deletes a command.
+	 *
+	 * @param newCommandId Command ID string
+	 * @param msg Message object
+	 */
+	async deleteCommand(
+		newCommandId: string,
+		msg?: Message,
+		silent?: boolean
+	): Promise<void> {
+		const parse = await CustomCommand.customParseCommand(
+			this.client.database,
+			newCommandId,
+			undefined,
+			msg
+		);
+
+		// If the user didn't enter the command right, show help
+		if (!parse) {
+			if (msg && !silent) {
+				await PluginManager.sendHelpForCommand(msg);
+			}
+			return;
+		}
+
+		const prefix = parse.prefix;
+		const command = parse.command;
+		const response = parse.oldResponse;
+
+		if (!command) {
+			if (msg && !silent) {
+				msg.discord?.channel.send(
+					`${msg.discord.author}, the comamnd doesn't exist!`
+				);
+				return;
+			}
+		} else if (!response) {
+			// If there's no response, if newContents is undefined
+			Logger.error(
+				"No response returned for CustomCommand.ts deleteCommand()!"
+			);
+			return undefined;
+		} else {
+			// Checks if the command exists
+			if (command) {
+				// Tries and deletes the command
+				try {
+					await this.client.database.deleteCommand(
+						command.id
+					);
+
+					// Tries and deletes the response
+					// TODO: don't delete the command if there's anything else connected to it
+					if (
+						response.commandResponses &&
+						response.commandResponses.length <= 1
+					) {
+						try {
+							await this.client.database.deleteResponse(
+								response.id
+							);
+						} catch (error) {
+							Logger.error(
+								`Failed to delete response\n${error.stack}`
+							);
+						}
+					}
+				} catch (error) {
+					// Outputs error
+					Logger.error(`${error.stack}`);
+					return undefined;
+				}
+
+				// If the command was valid, and (probably) didn't error out
+				if (command) {
+					if (msg?.discord) {
+						await msg.discord.channel.send(
+							`${msg.discord.author}, I've deleted the \`${prefix.prefix}${command.id}\` command.`
+						);
+					}
+				}
+			} else {
+				if (msg && !silent) {
+					await msg?.discord?.channel.send(
+						`${msg.discord.author}, the command doesn't exists!`
+					);
+				}
+				return undefined;
+			}
+		}
+	}
+}
