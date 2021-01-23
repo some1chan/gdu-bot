@@ -1,5 +1,5 @@
 dependencies:
-  '@framedjs/core': 0.2.1_a8117821c164e12ac167ac61424ea338
+  '@framedjs/core': 0.2.2_a8117821c164e12ac167ac61424ea338
   axios: 0.21.1
   colors: 1.4.0
   common-tags: 1.8.0
@@ -146,7 +146,7 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha512-ZfFsbgEXW71Rw/6EtBdrP5VxBJy4dthyC0tpQKGKmYFImlmmrykO14Za+BiIVduwjte0jXEBlhSKf0MWbFp9Eg==
-  /@framedjs/core/0.2.1_a8117821c164e12ac167ac61424ea338:
+  /@framedjs/core/0.2.2_a8117821c164e12ac167ac61424ea338:
     dependencies:
       '@framedjs/logger': 0.1.0
       '@framedjs/shared': 0.1.0
@@ -172,7 +172,7 @@ packages:
       twitch-chat-client: ^4.0.0
       typeorm: ^0.3.0
     resolution:
-      integrity: sha512-NpQQpXdT7DBn4GmrN6LpzKC/C7g/bQcWX7JwKDkwv4XXWpJQwkl1ojuo+bfhnBV7hVeV9HmqAWN++dB7JwzVYw==
+      integrity: sha512-AZlq9IsP+fyeWy6M4nXoIIyJwcwfnrNmsYek4gUjpRaFcEBOmM+PEX19trZQwf2sAnRMfW/6cjrzHTM11Pjy/g==
   /@framedjs/logger/0.1.0:
     dependencies:
       colors: 1.4.0
@@ -3138,7 +3138,7 @@ packages:
       tarball: https://codeload.github.com/discord/erlpack/tar.gz/e27db8f82892bdb9b28a0547cc394d68b5d2242d
     version: 0.1.3
 specifiers:
-  '@framedjs/core': ^0.2.1
+  '@framedjs/core': ^0.2.2
   '@types/common-tags': ^1.8.0
   '@types/luxon': ^1.25.1
   '@types/node-emoji': ^1.8.1
