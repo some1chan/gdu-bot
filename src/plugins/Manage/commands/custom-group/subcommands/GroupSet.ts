@@ -4,7 +4,7 @@ import {
 	BaseSubcommand,
 	PluginManager,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 
 export default class extends BaseSubcommand {

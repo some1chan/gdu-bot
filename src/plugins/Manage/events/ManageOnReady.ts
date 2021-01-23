@@ -1,4 +1,4 @@
-import { BasePlugin, BaseEvent, Message, Logger } from "framed.js";
+import { BasePlugin, BaseEvent, Message, Logger } from "@framedjs/core";
 import Discord from "discord.js";
 import Schedule from "node-schedule";
 

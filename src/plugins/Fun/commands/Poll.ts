@@ -7,7 +7,7 @@ import {
 	PluginManager,
 	Argument,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import Discord from "discord.js";
 import { emotes, oneOptionMsg, optionEmotes } from "../Fun.plugin";
 import { oneLine, stripIndents } from "common-tags";
@@ -20,20 +20,20 @@ export default class Poll extends BaseCommand {
 			description: stripIndents`
 				Create a quick poll through Discord. 
 				
-				${oneLine`The \`single\` "choose one only" option will work for a while,
+				${oneLine`The \`once\` "choose one only" option will work for a while,
 				until the bot is restarted. Once restarted, you shouldn't trust the
 				poll votes for singular votes.`}
 				
 				${oneLine`For a lasting "choose one only" poll, please use a
 				website like [strawpoll.me](https://strawpoll.me) instead!`}
 				`,
-			usage: '[single] <question> [..."options"]',
+			usage: '[once] <question> [..."options"]',
 			hideUsageInHelp: true,
 			examples: stripIndents`
 				\`{{prefix}}{{id}} Do you like pineapple on pizza?\` - Simple Poll
 				\`{{prefix}}{{id}} Rename \\"Pixel Pete\\"\` - Simple Poll With Quotes at the End
 				\`{{prefix}}{{id}} Ban Bim? "Yes" "Sure" "Why Not"\` - Custom Options
-				\`{{prefix}}{{id}} single PC or Console? "PC" "Console"\` - Choose One Only
+				\`{{prefix}}{{id}} once PC or Console? "PC" "Console"\` - Choose One Only
 			`,
 		});
 	}
@@ -42,7 +42,7 @@ export default class Poll extends BaseCommand {
 		if (msg.discord) {
 			const parseResults = await Poll.customParse(msg);
 			if (!parseResults) return false;
-			const askingForSingle = parseResults.askingForSingle;
+			const askingForOnce = parseResults.askingForOnce;
 			const pollOptionArgs = parseResults.pollOptionArgs;
 			const questionContent = parseResults.questionContent;
 
@@ -95,7 +95,7 @@ export default class Poll extends BaseCommand {
 					.setDescription(
 						`${description}${hasCodeBlock ? "" : "\n"}` +
 							`\nPoll by ${msg.discord.author}` +
-							`\n${askingForSingle ? oneOptionMsg : ""}`
+							`\n${askingForOnce ? oneOptionMsg : ""}`
 					);
 				const newMsg = await msg.discord.channel.send(embed);
 
@@ -154,8 +154,8 @@ export default class Poll extends BaseCommand {
 		silent?: boolean
 	): Promise<
 		| {
-				askingForSingle: boolean;
-				singleMultipleOption: string;
+				askingForOnce: boolean;
+				onceMultipleOption: string;
 				questionContent: string;
 				pollOptionArgs: string[];
 		  }
@@ -175,24 +175,24 @@ export default class Poll extends BaseCommand {
 			quoteSections: "flexible",
 		});
 
-		let singleMultipleOption = "";
+		let onceMultipleOption = "";
 
-		const isSingle = newContent.startsWith("single");
+		const isOnce = newContent.startsWith("once");
 		const isMultiple = newContent.startsWith("multiple");
-		const isSingleOrMultiple = isSingle || isMultiple;
+		const isOnceOrMultiple = isOnce || isMultiple;
 
-		// Removes the single/multiple parma from newContent
-		if (isSingleOrMultiple) {
-			if (isSingle) {
-				singleMultipleOption = "single";
+		// Removes the once/multiple parma from newContent
+		if (isOnceOrMultiple) {
+			if (isOnce) {
+				onceMultipleOption = "once";
 			} else if (isMultiple) {
-				singleMultipleOption = "multiple";
+				onceMultipleOption = "multiple";
 			}
 
-			// Handles combined "single question"
+			// Handles combined "once question"
 			newContent = newContent
-				.replace(`${singleMultipleOption} `, ``)
-				.replace(singleMultipleOption, "");
+				.replace(`${onceMultipleOption} `, ``)
+				.replace(onceMultipleOption, "");
 
 			// If there is no content now, the argument was alone before.
 			// This means we can remove it from args
@@ -256,7 +256,7 @@ export default class Poll extends BaseCommand {
 
 		const pollOptionArgs = Message.simplifyArgs(detailedArgs);
 
-		Logger.silly(`singleMultipleOption ${isSingleOrMultiple}`);
+		Logger.silly(`onceMultipleOption ${isOnceOrMultiple}`);
 		Logger.silly(`newArgs: "${newArgs}"`);
 
 		Logger.silly(stripIndents`
@@ -264,13 +264,13 @@ export default class Poll extends BaseCommand {
 			newContent: '${newContent}'
 			questionContent: '${questionContent}'
 			newArgs: '${newArgs}'
-			singleMultipleOption: '${singleMultipleOption}'
+			onceMultipleOption: '${onceMultipleOption}'
 			pollOptionsArgs: [${pollOptionArgs}]
 		`);
 
 		return {
-			askingForSingle: isSingleOrMultiple,
-			singleMultipleOption,
+			askingForOnce: isOnceOrMultiple,
+			onceMultipleOption,
 			questionContent,
 			pollOptionArgs,
 		};

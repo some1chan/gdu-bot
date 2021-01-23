@@ -5,7 +5,7 @@ import {
 	BaseCommand,
 	PluginManager,
 	DiscordUtils,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {

@@ -1,4 +1,4 @@
-import { Message, BasePlugin, BaseCommand, Utils } from "framed.js";
+import { Message, BasePlugin, BaseCommand, Utils } from "@framedjs/core";
 
 export default class extends BaseCommand {
 	randomResponses = [

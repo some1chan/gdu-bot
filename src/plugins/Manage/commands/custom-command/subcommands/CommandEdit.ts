@@ -1,6 +1,6 @@
-import { Command, Message, PluginManager, Logger } from "framed.js";
-import { BaseCommand } from "framed.js";
-import { BaseSubcommand } from "framed.js";
+import { Command, Message, PluginManager, Logger } from "@framedjs/core";
+import { BaseCommand } from "@framedjs/core";
+import { BaseSubcommand } from "@framedjs/core";
 import { stripIndents } from "common-tags";
 import CustomCommand from "../CustomCommand";
 

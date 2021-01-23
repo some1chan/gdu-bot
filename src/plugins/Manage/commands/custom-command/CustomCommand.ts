@@ -16,7 +16,7 @@ import {
 	DiscordUtils,
 	DiscohookOutputData,
 	Logger
-} from "framed.js";
+} from "@framedjs/core";
 
 export default class CustomCommand extends BaseCommand {
 	constructor(plugin: BasePlugin) {

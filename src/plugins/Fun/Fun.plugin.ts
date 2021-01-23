@@ -1,5 +1,5 @@
 // import Command, { CommandClass } from "../../src/structures/Command";
-import { BasePlugin, Client } from "framed.js";
+import { BasePlugin, Client } from "@framedjs/core";
 import path from "path";
 
 export default class extends BasePlugin {

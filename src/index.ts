@@ -2,7 +2,7 @@
 const startTime = process.hrtime();
 
 import { TypeORMLogger } from "./logger/TypeORMLogger";
-import * as Framed from "framed.js";
+import * as Framed from "@framedjs/core";
 import Colors from "colors";
 import Winston from "winston";
 import fs from "fs";
@@ -57,6 +57,11 @@ const client = new Framed.Client({
 		entities: [Framed.DatabaseManager.defaultEntitiesPath],
 	},
 	defaultPrefix: process.env.DEFAULT_PREFIX,
+	defaultHelpCommands: [
+		"$(command default.bot.info help)",
+		"$(command default.bot.fun poll)",
+		"$(command com.geekoverdrivestudio.dailies dailies)",
+	],
 	appVersion: appVersion,
 });
 

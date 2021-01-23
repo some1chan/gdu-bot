@@ -5,7 +5,7 @@ import {
 	BaseCommand,
 	BaseSubcommand,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { stripIndents } from "common-tags";
 import CustomCommand from "../CustomCommand";
 

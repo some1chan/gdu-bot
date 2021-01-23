@@ -5,7 +5,7 @@ import {
 	BaseCommand,
 	BasePlugin,
 	Message,
-} from "framed.js";
+} from "@framedjs/core";
 import path from "path";
 
 export default class CustomGroup extends BaseCommand {

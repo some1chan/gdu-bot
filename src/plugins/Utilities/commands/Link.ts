@@ -1,4 +1,4 @@
-import { Message, BasePlugin, BaseCommand, EmbedHelper, Logger } from "framed.js";
+import { Message, BasePlugin, BaseCommand, EmbedHelper, Logger } from "@framedjs/core";
 import Raw from "../../Markdown/commands/Raw";
 import Discord from "discord.js";
 import * as ShortenURL from "../utils/ShortenURL";

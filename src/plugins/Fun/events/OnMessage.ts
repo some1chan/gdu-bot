@@ -1,4 +1,4 @@
-import { BaseEvent, BasePlugin, Message } from "framed.js";
+import { BaseEvent, BasePlugin, Message } from "@framedjs/core";
 import Discord from "discord.js";
 
 export default class extends BaseEvent {

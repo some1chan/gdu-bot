@@ -7,7 +7,7 @@ import {
 	NotFoundError,
 	PluginManager,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 
 export default class extends BaseCommand {

@@ -6,7 +6,7 @@ import {
 	EmbedHelper,
 	NotFoundError,
 	PluginManager,
-} from "framed.js";
+} from "@framedjs/core";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {

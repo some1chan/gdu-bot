@@ -4,7 +4,7 @@ import {
 	BasePlugin,
 	BaseCommand,
 	PluginManager,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine, oneLineInlineLists, stripIndent } from "common-tags";
 import Help from "./Help";
 import Discord from "discord.js";

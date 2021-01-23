@@ -1,3 +1,41 @@
+# VS Code Auto-generated
+**/.classpath
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/azds.yaml
+**/charts
+**/docker-compose*
+**/Dockerfile*
+**/node_modules
+**/npm-debug.log
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+README.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+debug-compose.yml
+.dockerignore
+
+# Other
+.github
+.vscode
+.gitignore
+
+## .gitignore copy stares here
+
 # Sensitive files
 settings.json
 refresh_token.json

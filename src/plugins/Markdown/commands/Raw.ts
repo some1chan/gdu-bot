@@ -7,7 +7,7 @@ import {
 	DiscordUtils,
 	FriendlyError,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine, stripIndent, stripIndents } from "common-tags";
 import Discord from "discord.js";
 import Hastebin from "hastebin";

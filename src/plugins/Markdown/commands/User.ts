@@ -7,7 +7,7 @@ import {
 	PluginManager,
 	NotFoundError,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 import Discord from "discord.js";
 

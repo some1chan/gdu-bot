@@ -1,7 +1,13 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { EmbedHelper, Message, BasePlugin, BaseCommand, Logger } from "framed.js";
+import {
+	EmbedHelper,
+	Message,
+	BasePlugin,
+	BaseCommand,
+	Logger,
+} from "@framedjs/core";
 import { oneLineInlineLists, stripIndent } from "common-tags";
-import { HelpData } from "framed.js";
+import { HelpData } from "@framedjs/core";
 import Discord from "discord.js";
 
 const data: HelpData[] = [
@@ -80,9 +86,7 @@ export default class Help extends BaseCommand {
 	 * @param msg Framed message
 	 */
 	private async showHelpAll(msg: Message): Promise<boolean> {
-		const helpFields = await this.client.plugins.createHelpFields(
-			data
-		);
+		const helpFields = await this.client.plugins.createHelpFields(data);
 
 		if (msg.discord && helpFields) {
 			const embed = EmbedHelper.getTemplate(
@@ -118,7 +122,7 @@ export default class Help extends BaseCommand {
 			} catch (error) {
 				Logger.error(error.stack);
 				await msg.discord.channel.send(
-					`${msg.discord.author}, the embed size for help is too large! Contact one of the bot masters.`
+					`${msg.discord.author}, the embed size for help is too large! If this issue persists, contact the developer.`
 				);
 			}
 			return true;

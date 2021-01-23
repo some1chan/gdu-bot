@@ -1,6 +1,6 @@
-import { Command, EmbedHelper, Message, PluginManager, Logger } from "framed.js";
-import { BaseCommand } from "framed.js";
-import { BaseSubcommand } from "framed.js";
+import { Command, EmbedHelper, Message, PluginManager, Logger } from "@framedjs/core";
+import { BaseCommand } from "@framedjs/core";
+import { BaseSubcommand } from "@framedjs/core";
 import { oneLine, oneLineInlineLists } from "common-tags";
 
 import CustomCommand from "../CustomCommand";

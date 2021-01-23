@@ -8,7 +8,7 @@ import {
 	Logger,
 	Utils,
 	version as backEndVersion,
-} from "framed.js";
+} from "@framedjs/core";
 import { stripIndent } from "common-tags";
 import os from "os";
 

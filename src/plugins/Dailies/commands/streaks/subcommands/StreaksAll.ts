@@ -1,4 +1,4 @@
-import { BaseCommand, BaseSubcommand, Message } from "framed.js";
+import { BaseCommand, BaseSubcommand, Message } from "@framedjs/core";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {

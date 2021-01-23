@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-irregular-whitespace */
 import Discord from "discord.js";
-import { BasePlugin, BaseEvent, Logger } from "framed.js";
+import { BasePlugin, BaseEvent, Logger } from "@framedjs/core";
 
 export default class extends BaseEvent {
 	constructor(plugin: BasePlugin) {

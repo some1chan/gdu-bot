@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import { emotes, oneOptionMsg, optionEmotes } from "../Fun.plugin";
-import { BaseEvent, BasePlugin, Logger, Message } from "framed.js";
+import { BaseEvent, BasePlugin, Logger, Message } from "@framedjs/core";
 import Emoji from "node-emoji"; // Doing this only because Windows can't render emotes for some reason
 import { oneLine } from "common-tags";
 import Poll from "../commands/Poll";
@@ -71,7 +71,7 @@ export default class extends BaseEvent {
 
 		const singleVoteOnly: boolean | undefined =
 			embedDescription?.endsWith(oneOptionMsg.toLocaleLowerCase()) ||
-			parsedResults?.askingForSingle;
+			parsedResults?.askingForOnce;
 
 		const isPollCommand =
 			reaction.message.content.startsWith(".poll") ||

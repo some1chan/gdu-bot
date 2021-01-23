@@ -1,4 +1,4 @@
-import { Message, BasePlugin, BaseCommand, EmbedHelper, Logger } from "framed.js";
+import { Message, BasePlugin, BaseCommand, EmbedHelper, Logger } from "@framedjs/core";
 import { commaListsAnd, oneLineCommaLists } from "common-tags";
 import { DateTime } from "luxon";
 

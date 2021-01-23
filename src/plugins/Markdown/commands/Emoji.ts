@@ -6,7 +6,7 @@ import {
 	PluginManager,
 	NotFoundError,
 	Logger,
-} from "framed.js";
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 import Emoji from "node-emoji";
 

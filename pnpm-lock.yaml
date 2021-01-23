@@ -1,5 +1,5 @@
 dependencies:
-  '@framedjs/core': 0.1.0_a848d9d402d95ae5cf24143b5f36e037
+  '@framedjs/core': 0.2.1_a8117821c164e12ac167ac61424ea338
   axios: 0.21.1
   colors: 1.4.0
   common-tags: 1.8.0
@@ -10,14 +10,14 @@ dependencies:
   node-emoji: 1.10.0
   node-schedule: 1.3.2
   sqlite3: 5.0.1
-  twitch: 4.4.0
-  twitch-auth: 4.4.0
-  twitch-chat-client: 4.4.0_8c34c910c312f3089887e40e6ee72cff
+  twitch: 4.4.3
+  twitch-auth: 4.4.3
+  twitch-chat-client: 4.4.3_58fac356376bc570f8c4e30a952b8174
   typeorm: 0.3.0-rc.21
   winston: 3.3.3
 devDependencies:
   '@types/common-tags': 1.8.0
-  '@types/luxon': 1.25.0
+  '@types/luxon': 1.25.1
   '@types/node-emoji': 1.8.1
   '@types/node-schedule': 1.3.1
   ts-node-dev: 1.1.1_typescript@4.1.3
@@ -29,21 +29,21 @@ optionalDependencies:
   utf-8-validate: 5.0.4
   zlib-sync: 0.1.7
 packages:
-  /@d-fischer/cache-decorators/2.1.1:
+  /@d-fischer/cache-decorators/2.1.3:
     dependencies:
-      '@d-fischer/shared-utils': 2.4.2
-      '@types/node': 14.14.20
+      '@d-fischer/shared-utils': 3.0.1
+      '@types/node': 14.14.22
       tslib: 2.1.0
     dev: false
     resolution:
-      integrity: sha512-qdRejrYFStvdreFFUH4Tl1AvH+MV34vATj8yqrbis5HVwMqbLbLyb38H1hSKEiWFGBjLtCcgfJtC0LvgJivgzg==
+      integrity: sha512-MlM8ipg5Exkc0Ok//sG83smBW4mLRL+/ZngfxYQ8IgxBjfpM3m2M+Y2X+a9St3EyJfYoVKHR8RWdICsU+W3gSA==
   /@d-fischer/connection/6.4.1_c70f8fc5586dd378b8c866035dbe710b:
     dependencies:
       '@d-fischer/isomorphic-ws': 5.0.3_ws@7.4.2
       '@d-fischer/logger': 3.1.0
       '@d-fischer/shared-utils': 3.0.1
       '@d-fischer/typed-event-emitter': 3.2.2
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
       '@types/ws': 7.4.0
       tslib: 2.1.0
       ws: 7.4.2_c70f8fc5586dd378b8c866035dbe710b
@@ -105,28 +105,21 @@ packages:
     dependencies:
       '@d-fischer/logger': 3.1.0
       '@d-fischer/promise.allsettled': 2.0.1
-      '@types/node': 12.19.13
+      '@types/node': 12.19.15
       tslib: 2.1.0
     dev: false
     resolution:
       integrity: sha512-ei9SFxSMEQ0Z0R0VJeuqAJ5aQHWVDetjNX+Z7sU7cgxtF0842HIPQvzeaUx4/aPiW4UiirYsGFTLOkN8sbkmZA==
-  /@d-fischer/shared-utils/2.4.2:
-    dependencies:
-      '@types/node': 14.14.20
-      tslib: 2.1.0
-    dev: false
-    resolution:
-      integrity: sha512-th2EGPG8c6hrAPA0PmRQlwvWIVDDj+/1jitL+Dhoi414Zl6fKVKfm44xsLqIvtFm5pGJBXKQSrP+Lcyj7Akxlg==
   /@d-fischer/shared-utils/3.0.1:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
       tslib: 2.1.0
     dev: false
     resolution:
       integrity: sha512-q+ipJ0HN1SeC9MXYLpZvtNjNwaEhqmVK0pquaEjWWAZGntEzTQ1KugBUHeYo04dPdOCh7Eovn/hp1mvobc0rgg==
   /@d-fischer/typed-event-emitter/3.2.2:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
       tslib: 2.1.0
     dev: false
     resolution:
@@ -153,7 +146,7 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha512-ZfFsbgEXW71Rw/6EtBdrP5VxBJy4dthyC0tpQKGKmYFImlmmrykO14Za+BiIVduwjte0jXEBlhSKf0MWbFp9Eg==
-  /@framedjs/core/0.1.0_a848d9d402d95ae5cf24143b5f36e037:
+  /@framedjs/core/0.2.1_a8117821c164e12ac167ac61424ea338:
     dependencies:
       '@framedjs/logger': 0.1.0
       '@framedjs/shared': 0.1.0
@@ -165,24 +158,23 @@ packages:
       node-emoji: 1.10.0
       reflect-metadata: 0.1.13
       require-all: 3.0.0
-      twitch: 4.4.0
-      twitch-auth: 4.4.0
-      twitch-chat-client: 4.4.0_8c34c910c312f3089887e40e6ee72cff
+      twitch: 4.4.3
+      twitch-auth: 4.4.3
+      twitch-chat-client: 4.4.3_58fac356376bc570f8c4e30a952b8174
       typeorm: 0.3.0-rc.21
     dev: false
     engines:
       node: '>=12.0.0'
     peerDependencies:
-      discord.js: ^12.0.0
+      discord.js: ^12.5.0
       twitch: ^4.0.0
       twitch-auth: ^4.0.0
       twitch-chat-client: ^4.0.0
-      typeorm: ^0.2.0
+      typeorm: ^0.3.0
     resolution:
-      integrity: sha512-4Q5RufPAVSeWnOD1oDlcgY2HvBbGq7gHyJmLvKSNH8FAVOgEdjaQHouXKxu+RI71zrL9oTTukiKSOFqmp1Ef3A==
+      integrity: sha512-NpQQpXdT7DBn4GmrN6LpzKC/C7g/bQcWX7JwKDkwv4XXWpJQwkl1ojuo+bfhnBV7hVeV9HmqAWN++dB7JwzVYw==
   /@framedjs/logger/0.1.0:
     dependencies:
-      captains-log: 2.0.3
       colors: 1.4.0
       winston: 3.3.3
     dev: false
@@ -192,10 +184,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-PC5XhLRyICKQZeUPTF6Nxq86cGqmkOUN5AmyzOs/H5B1X8yNKNnRZ9d7tMT0ozwf3LXsT5JVzs4RPaq+vz5XgA==
-  /@sailshq/lodash/3.10.4:
-    dev: false
-    resolution:
-      integrity: sha512-YXJqp9gdHcZKAmBY/WnwFpPtNQp2huD/ME2YMurH2YHJvxrVzYsmpKw/pb7yINArRpp8E++fwbQd3ajYXGA45Q==
   /@sqltools/formatter/1.2.2:
     dev: false
     resolution:
@@ -204,34 +192,34 @@ packages:
     dev: true
     resolution:
       integrity: sha512-htRqZr5qn8EzMelhX/Xmx142z218lLyGaeZ3YR8jlze4TATRU9huKKvuBmAJEW4LCC4pnY1N6JAm6p85fMHjhg==
-  /@types/luxon/1.25.0:
+  /@types/luxon/1.25.1:
     dev: true
     resolution:
-      integrity: sha512-iIJp2CP6C32gVqI08HIYnzqj55tlLnodIBMCcMf28q9ckqMfMzocCmIzd9JWI/ALLPMUiTkCu1JGv3FFtu6t3g==
+      integrity: sha512-enkMO4WJcbdkhK1eZrItF616buau02wtrSN+DDt9Qj9U23boSAXNJm0fMlgwpTDaRHq3S0D/SPIRbxy4YxBjiA==
   /@types/node-emoji/1.8.1:
     dev: true
     resolution:
       integrity: sha512-0fRfA90FWm6KJfw6P9QGyo0HDTCmthZ7cWaBQndITlaWLTZ6njRyKwrwpzpg+n6kBXBIGKeUHEQuBx7bphGJkA==
-  /@types/node-fetch/2.5.7:
+  /@types/node-fetch/2.5.8:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
       form-data: 3.0.0
     dev: false
     resolution:
-      integrity: sha512-o2WVNf5UhWRkxlf6eq+jMZDu7kjgpgJfl4xVNlvryc95O/6F2ld8ztKX+qu+Rjyet93WAWm5LjeX9H5FGkODvw==
+      integrity: sha512-fbjI6ja0N5ZA8TV53RUqzsKNkl9fv8Oj3T7zxW7FGv1GSH7gwJaNF8dzCjrqKaxKeUpTz4yT1DaJFq/omNpGfw==
   /@types/node-schedule/1.3.1:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
     dev: true
     resolution:
       integrity: sha512-xAY/ZATrThUkMElSDfOk+5uXprCrV6c6GQ5gTw3U04qPS6NofE1dhOUW+yrOF2UyrUiAax/Zc4WtagrbPAN3Tw==
-  /@types/node/12.19.13:
+  /@types/node/12.19.15:
     dev: false
     resolution:
-      integrity: sha512-qdixo2f0U7z6m0UJUugTJqVF94GNDkdgQhfBtMs8t5898JE7G/D2kJYw4rc1nzjIPLVAsDkY2MdABnLAP5lM1w==
-  /@types/node/14.14.20:
+      integrity: sha512-lowukE3GUI+VSYSu6VcBXl14d61Rp5hA1D+61r16qnwC0lYNSqdxcvRh0pswejorHfS+HgwBasM8jLXz0/aOsw==
+  /@types/node/14.14.22:
     resolution:
-      integrity: sha512-Y93R97Ouif9JEOWPIUyU+eyIdyRqQR0I8Ez1dzku4hDx34NWh4HbtIc3WNzwB1Y9ULvNGeu5B8h8bVL5cAk4/A==
+      integrity: sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
   /@types/strip-bom/3.0.0:
     dev: true
     resolution:
@@ -242,7 +230,7 @@ packages:
       integrity: sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
   /@types/ws/7.4.0:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
     dev: false
     resolution:
       integrity: sha512-Y29uQ3Uy+58bZrFLhX36hcI3Np37nqWE7ky5tjiDoy1GDZnIwVxS0CgF+s+1bXMzjKBFy+fqaRfb708iNzdinw==
@@ -353,7 +341,7 @@ packages:
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.1.3
-      es-abstract: 1.18.0-next.1
+      es-abstract: 1.18.0-next.2
       es-array-method-boxes-properly: 1.0.0
       is-string: 1.0.5
     dev: false
@@ -499,15 +487,6 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-fB0W1nmhu+WcoCys7PsBHiAfWh8=
-  /captains-log/2.0.3:
-    dependencies:
-      '@sailshq/lodash': 3.10.4
-      chalk: 1.1.3
-      rc: 1.2.8
-      semver: 5.4.1
-    dev: false
-    resolution:
-      integrity: sha512-hKlNLw/4Qz1vPDhAbn3pRexi8fzY7d3SwX/BtI2lMG09UqK1W1mf2pYFslau3ZPWxdcwBBcsLLi9ngs+xhqD2Q==
   /capture-stack-trace/1.0.1:
     dev: false
     engines:
@@ -540,7 +519,7 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-qwx12AxXe2Q5xQ43Ac//I6v5aXTipYrSESdOgzrN+9XjgEpyjpKuvSGaN4qE93f7TQTlerQQ8S+EQ0EyDoVL1A==
-  /chokidar/3.5.0:
+  /chokidar/3.5.1:
     dependencies:
       anymatch: 3.1.1
       braces: 3.0.2
@@ -555,7 +534,7 @@ packages:
     optionalDependencies:
       fsevents: 2.3.1
     resolution:
-      integrity: sha512-JgQM9JS92ZbFR4P90EvmzNpSGhpPBGBSj10PILeDyYFwp4h2/D9OM03wsJ4zW1fEp4ka2DGrnUeD7FuvQ2aZ2Q==
+      integrity: sha512-9+s+Od+W0VJJzawDma/gvBNQqkTiqYTWLuZoyAsivsI4AaWTCzHG06/TMjsf1cYe9Cb97UCEhjz7HvnPk2p/tw==
   /chownr/1.1.4:
     dev: false
     resolution:
@@ -922,10 +901,12 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-VBl/gnfcJ7OercKA9MVaegWsBHFjV492syMudcnQZvt/Dw8ezpcOHYZXa/J96O8vx+g4x65YKhxOwDUh63aS5g==
-  /es-abstract/1.18.0-next.1:
+  /es-abstract/1.18.0-next.2:
     dependencies:
+      call-bind: 1.0.2
       es-to-primitive: 1.2.1
       function-bind: 1.1.1
+      get-intrinsic: 1.0.2
       has: 1.0.3
       has-symbols: 1.0.1
       is-callable: 1.2.2
@@ -940,7 +921,7 @@ packages:
     engines:
       node: '>= 0.4'
     resolution:
-      integrity: sha512-I4UGspA0wpZXWENrdA0uHbnhte683t3qT/1VFH9aX2dA5PPSf6QW5HHXf5HImaqPmjXaVeVk4RGWnaylmV7uAA==
+      integrity: sha512-Ih4ZMFHEtZupnUh6497zEL4y2+w8+1ljnCyaTa+adcoafI1GOvMwFlDjBLfWR7y9VLfrjRJe9ocuHY1PSR9jjw==
   /es-array-method-boxes-properly/1.0.0:
     dev: false
     resolution:
@@ -1378,14 +1359,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
-  /ircv3/0.26.11_c70f8fc5586dd378b8c866035dbe710b:
+  /ircv3/0.26.12_c70f8fc5586dd378b8c866035dbe710b:
     dependencies:
       '@d-fischer/connection': 6.4.1_c70f8fc5586dd378b8c866035dbe710b
       '@d-fischer/escape-string-regexp': 5.0.0
       '@d-fischer/logger': 3.1.0
       '@d-fischer/shared-utils': 3.0.1
       '@d-fischer/typed-event-emitter': 3.2.2
-      '@types/node': 14.14.20
+      '@types/node': 14.14.22
       klona: 2.0.4
       tslib: 2.1.0
     dev: false
@@ -1393,7 +1374,7 @@ packages:
       bufferutil: '*'
       utf-8-validate: '*'
     resolution:
-      integrity: sha512-FG8t226WkpGhaiM4umpnEiqNMfsIiNz2wQ3iokvEa7/ZgXUVWtlUmdZ1GOc/pFmVeJ8Q8B2Ji8jgrT4EXpUNEA==
+      integrity: sha512-lPshVcxYHLboS+EgsFZQE3i4J/yTsCTj/m2wTyJ7TFZz+AQGDBnmD+7UA/94q6exe3Ql4XOLWfRkBC7rdFc2cg==
   /is-arguments/1.1.0:
     dependencies:
       call-bind: 1.0.2
@@ -2417,11 +2398,6 @@ packages:
     optional: true
     resolution:
       integrity: sha1-myzl094C0XxgEq0yaqa00M9U+U8=
-  /semver/5.4.1:
-    dev: false
-    hasBin: true
-    resolution:
-      integrity: sha512-WfG/X9+oATh81XtllIo/I8gOiY9EXRdv1cQdyykeXK17YcUW3EXUAi2To4pcH6nZtJPr7ZOpM5OMyWJZm+8Rsg==
   /semver/5.7.1:
     hasBin: true
     resolution:
@@ -2739,7 +2715,7 @@ packages:
       integrity: sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
   /ts-node-dev/1.1.1_typescript@4.1.3:
     dependencies:
-      chokidar: 3.5.0
+      chokidar: 3.5.1
       dateformat: 1.0.12
       dynamic-dedupe: 0.3.0
       minimist: 1.2.5
@@ -2819,71 +2795,72 @@ packages:
     dev: false
     resolution:
       integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
-  /twitch-api-call/4.4.0:
+  /twitch-api-call/4.4.3:
     dependencies:
       '@d-fischer/cross-fetch': 4.0.2
       '@d-fischer/qs': 7.0.2
-      '@types/node-fetch': 2.5.7
+      '@types/node-fetch': 2.5.8
       node-fetch: 2.6.1
       tslib: 2.1.0
-      twitch-common: 4.4.0
+      twitch-common: 4.4.3
     dev: false
     resolution:
-      integrity: sha512-1fMviCTbEjzUHdKssMpQAAcSuYec3UqI2c/VBt0zpXzgbZoywgxlzTJIUWGZGyTFdRSIWskWrlI/zEqdX87Srg==
-  /twitch-auth/4.4.0:
+      integrity: sha512-hvH7SOS+YT2Ejl/tELOy/uPGpPgILyl/gRiraxWtJG8OO63tnxWweRv6IWDSSV5O2K1WtI6vILWi+dJuIMRnkw==
+  /twitch-auth/4.4.3:
     dependencies:
       '@d-fischer/deprecate': 2.0.2
       '@d-fischer/logger': 3.1.0
       '@d-fischer/shared-utils': 3.0.1
       tslib: 2.1.0
-      twitch-api-call: 4.4.0
-      twitch-common: 4.4.0
+      twitch-api-call: 4.4.3
+      twitch-common: 4.4.3
     dev: false
     resolution:
-      integrity: sha512-dHOfSCNMx1unzFVrzIfSuy0TyxknGQV56mg1hJuUOBzQRLMuZ+TmoycFXQvkAS1kMfMR+lAVSP/aR+qny18KSQ==
-  /twitch-chat-client/4.4.0_8c34c910c312f3089887e40e6ee72cff:
+      integrity: sha512-lRBUfviFzGz9TKMI00I2dikquP+MN5b6I+N2UgpCqbmscSxc6nVxzGybPOZLV+/VHKCj2hkrxpwy56gJJSle8w==
+  /twitch-chat-client/4.4.3_58fac356376bc570f8c4e30a952b8174:
     dependencies:
-      '@d-fischer/cache-decorators': 2.1.1
+      '@d-fischer/cache-decorators': 2.1.3
       '@d-fischer/deprecate': 2.0.2
       '@d-fischer/logger': 3.1.0
       '@d-fischer/rate-limiter': 0.4.2
       '@d-fischer/shared-utils': 3.0.1
       '@d-fischer/typed-event-emitter': 3.2.2
-      ircv3: 0.26.11_c70f8fc5586dd378b8c866035dbe710b
+      ircv3: 0.26.12_c70f8fc5586dd378b8c866035dbe710b
       tslib: 2.1.0
-      twitch: 4.4.0
-      twitch-auth: 4.4.0
-      twitch-common: 4.4.0
+      twitch: 4.4.3
+      twitch-auth: 4.4.3
+      twitch-common: 4.4.3
     dev: false
     peerDependencies:
       bufferutil: '*'
       twitch: ^4.4.0
       utf-8-validate: '*'
     resolution:
-      integrity: sha512-I6uqQCNtV+AnTcBnmtlerNK5rBQpZPIuZVV4FW7HF7TJpNAT8mCQWaQudhbwAnHQlK1XLhyUaNvrpHryz832bg==
-  /twitch-common/4.4.0:
+      integrity: sha512-OXaOHGfg2Zpt8Kau9+XPTn5Sd8h+Bdgnb1eV5pGkdfRF3vb7oTdf+4iMnzdyniSmuKnZpHsuL7IQpv6Qcx4daA==
+  /twitch-common/4.4.3:
     dependencies:
       '@d-fischer/logger': 3.1.0
+      '@d-fischer/shared-utils': 3.0.1
       tslib: 2.1.0
     dev: false
     resolution:
-      integrity: sha512-HpAZDBpMK2wk7UMg56jswSnfXBT0tIx9ekyXUZBiFNH3vCbFgWCcncXQk9MYHpuNd4HJc1McJCkZJtnHgrDaPw==
-  /twitch/4.4.0:
+      integrity: sha512-Kydqv9k6fcYDIaFaCQy4OGtVPrIYO6aNE+t6w7mGdiilNIScUYSaC99jNnu/M0oUQHXxtz9Xrdot7LJfYKKKZw==
+  /twitch/4.4.3:
     dependencies:
-      '@d-fischer/cache-decorators': 2.1.1
+      '@d-fischer/cache-decorators': 2.1.3
       '@d-fischer/deprecate': 2.0.2
       '@d-fischer/logger': 3.1.0
       '@d-fischer/rate-limiter': 0.4.2
       '@d-fischer/shared-utils': 3.0.1
       top-package: 1.0.1
       tslib: 2.1.0
-      twitch-api-call: 4.4.0
-      twitch-auth: 4.4.0
-      twitch-common: 4.4.0
+      twitch-api-call: 4.4.3
+      twitch-auth: 4.4.3
+      twitch-common: 4.4.3
     dev: false
     requiresBuild: true
     resolution:
-      integrity: sha512-98uFiZFtiHEt6lFhyS1Jhl1lz8yD+ognd0cHiqI98WZ991SDMZMS6XPeudJIX8gwar/hFWivoskNH2KtSda+Uw==
+      integrity: sha512-13YXivPXNE+BMrtvgbgz69RzJGeJeD3MQ9yPm2FTMJMNMNV3u/wQlVtEOvLovXKleDt+/13dVA9CRU5+fA+aoA==
   /type-is/1.6.18:
     dependencies:
       media-typer: 0.3.0
@@ -3161,9 +3138,9 @@ packages:
       tarball: https://codeload.github.com/discord/erlpack/tar.gz/e27db8f82892bdb9b28a0547cc394d68b5d2242d
     version: 0.1.3
 specifiers:
-  '@framedjs/core': ^0.1.0
+  '@framedjs/core': ^0.2.1
   '@types/common-tags': ^1.8.0
-  '@types/luxon': ^1.25.0
+  '@types/luxon': ^1.25.1
   '@types/node-emoji': ^1.8.1
   '@types/node-schedule': ^1.3.1
   axios: ^0.21.1
@@ -3179,9 +3156,9 @@ specifiers:
   node-schedule: ^1.3.2
   sqlite3: ^5.0.1
   ts-node-dev: ^1.1.1
-  twitch: ^4.4.0
-  twitch-auth: ^4.4.0
-  twitch-chat-client: ^4.4.0
+  twitch: ^4.4.3
+  twitch-auth: ^4.4.3
+  twitch-chat-client: ^4.4.3
   typeorm: ^0.3.0-rc.21
   typescript: ^4.1.3
   utf-8-validate: ^5.0.4

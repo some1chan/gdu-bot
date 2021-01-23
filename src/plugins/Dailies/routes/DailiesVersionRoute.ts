@@ -1,4 +1,4 @@
-import { BaseRouter, DatabaseManager, Client, Logger, Utils } from "framed.js";
+import { BaseRouter, DatabaseManager, Client, Logger, Utils } from "@framedjs/core";
 
 export default class extends BaseRouter {
 	constructor(client: Client) {
@@ -27,7 +27,7 @@ export default class extends BaseRouter {
 					}
 
 					plugin.data.version = version;
-					await pluginRepo.save(plugin);
+					await pluginRepo.save([plugin]);
 
 					ctx.status = 201;
 				} catch (error) {

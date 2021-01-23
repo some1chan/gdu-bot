@@ -1,5 +1,5 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { Message, BasePlugin, BaseCommand } from "framed.js";
+import { Message, BasePlugin, BaseCommand } from "@framedjs/core";
 import { stripIndent } from "common-tags";
 import Raw from "./Raw";
 

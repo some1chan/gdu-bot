@@ -1,6 +1,6 @@
-import { EmbedHelper, Message, BasePlugin, BaseCommand, Logger } from "framed.js";
+import { EmbedHelper, Message, BasePlugin, BaseCommand, Logger } from "@framedjs/core";
 import { oneLine } from "common-tags";
-import { HelpData } from "framed.js";
+import { HelpData } from "@framedjs/core";
 
 const data: HelpData[] = [
 	{

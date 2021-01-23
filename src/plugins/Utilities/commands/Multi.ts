@@ -1,4 +1,4 @@
-import { BasePlugin, BaseCommand, Message, MessageOptions, Logger } from "framed.js";
+import { BasePlugin, BaseCommand, Message, MessageOptions, Logger } from "@framedjs/core";
 import { oneLine, stripIndents } from "common-tags";
 
 export default class Multi extends BaseCommand {

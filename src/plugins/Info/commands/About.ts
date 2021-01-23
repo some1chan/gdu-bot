@@ -1,4 +1,4 @@
-import { BaseCommand, BasePlugin, EmbedHelper, Message } from "framed.js";
+import { BaseCommand, BasePlugin, EmbedHelper, Message } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {

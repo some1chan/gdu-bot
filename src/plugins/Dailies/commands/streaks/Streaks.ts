@@ -1,4 +1,4 @@
-import { BaseCommand, BasePlugin, Message } from "framed.js";
+import { BaseCommand, BasePlugin, Message } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 import path from "path";
 

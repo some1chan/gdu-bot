@@ -1,4 +1,4 @@
-import { Message, BaseCommand, BaseSubcommand, PluginManager, Logger } from "framed.js";
+import { Message, BaseCommand, BaseSubcommand, PluginManager, Logger } from "@framedjs/core";
 import { oneLine } from "common-tags";
 
 export default class extends BaseSubcommand {

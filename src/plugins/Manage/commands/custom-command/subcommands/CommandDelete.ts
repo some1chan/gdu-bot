@@ -1,6 +1,6 @@
-import { Logger, Message, PluginManager } from "framed.js";
-import { BaseCommand } from "framed.js";
-import { BaseSubcommand } from "framed.js";
+import { Logger, Message, PluginManager } from "@framedjs/core";
+import { BaseCommand } from "@framedjs/core";
+import { BaseSubcommand } from "@framedjs/core";
 import CustomCommand from "../CustomCommand";
 
 export default class extends BaseSubcommand {

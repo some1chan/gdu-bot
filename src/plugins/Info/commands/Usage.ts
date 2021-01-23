@@ -1,5 +1,5 @@
 import { stripIndent } from "common-tags";
-import { EmbedHelper, Message, BasePlugin, BaseCommand } from "framed.js";
+import { EmbedHelper, Message, BasePlugin, BaseCommand } from "@framedjs/core";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
