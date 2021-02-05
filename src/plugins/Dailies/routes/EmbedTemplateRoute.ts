@@ -32,16 +32,21 @@ export default class extends BaseRouter {
 					platform: "discord",
 				};
 
-			const json = JSON.stringify(
-				EmbedHelper.getTemplateRaw(
-					EmbedHelper.getColorWithFallback(undefined, guildColor),
-					await EmbedHelper.getCheckOutFooter(
-						client.formatting,
-						place,
-						client.helpCommands,
-						commandUsed
-					)
+			const embed = EmbedHelper.getTemplateRaw(
+				EmbedHelper.getColorWithFallback(undefined, guildColor),
+				await EmbedHelper.getCheckOutFooter(
+					client.formatting,
+					place,
+					client.helpCommands,
+					commandUsed
 				)
+			);
+
+			// Workaround to make dailies bot not freak out when the icon_url doesn't exist
+			embed.setFooter(`${embed.footer?.text ? embed.footer.text : ""}`, embed.footer?.iconURL ? embed.footer.iconURL : "");
+
+			const json = JSON.stringify(
+				embed
 			);
 
 			ctx.set("Content-Type", "application/json");
