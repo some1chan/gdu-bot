@@ -9,7 +9,7 @@ export default class extends BaseCommand {
 			usage: "<nickname>",
 			permissions: {
 				discord: {
-					permissions: ["CHANGE_NICKNAME"],
+					permissions: ["MANAGE_GUILD"],
 				},
 			},
 		});
@@ -56,7 +56,9 @@ export default class extends BaseCommand {
 					}
 					return true;
 				} else {
-					msg.send("This command isn't supported on other platforms!");
+					msg.send(
+						"This command isn't supported on other platforms!"
+					);
 					return false;
 				}
 			}

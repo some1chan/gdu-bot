@@ -45,7 +45,10 @@ export default class extends BaseCommand {
 			return false;
 		}
 
-		const randomIndex = Utils.randomNumber(0, this.randomResponses.length - 1);
+		const randomIndex = Utils.randomNumber(
+			0,
+			this.randomResponses.length - 1
+		);
 		const randomResponse = this.randomResponses[randomIndex];
 		await msg.send(`${randomResponse}`);
 		return true;

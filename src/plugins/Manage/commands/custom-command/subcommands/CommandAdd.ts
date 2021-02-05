@@ -5,6 +5,7 @@ import {
 	BaseCommand,
 	BaseSubcommand,
 	Logger,
+	Place,
 } from "@framedjs/core";
 import { stripIndents } from "common-tags";
 import CustomCommand from "../CustomCommand";
@@ -16,8 +17,8 @@ export default class extends BaseSubcommand {
 			aliases: ["a", "create", "cr"],
 			about: "Adds a custom command.",
 			examples: stripIndents`
-			\`{{prefix}}command {{id}} newcommand This is a test message.\`
-			\`{{prefix}}command {{id}} newcommand Test message! "Test description!"\`
+			\`$(command default.bot.manage command add) newcommand This is a test message.\`
+			\`$(command default.bot.manage command add) newcommand Test message! "Test description!"\`
 			`,
 			hideUsageInHelp: true,
 		});
@@ -39,11 +40,16 @@ export default class extends BaseSubcommand {
 			);
 			if (parse) {
 				const { newCommandId, newArgs } = parse;
-				return this.addCommand(newCommandId, newArgs, msg);
+				return this.addCommand(
+					newCommandId,
+					newArgs,
+					await msg.getPlace(true),
+					msg
+				);
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg);
+		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
 		return false;
 	}
 
@@ -52,13 +58,16 @@ export default class extends BaseSubcommand {
 	 *
 	 * @param newCommandId Command ID string
 	 * @param newContents Contents to add, in an array
+	 * @param place Place data. Should try to use non-default ID
 	 * @param msg Message object
+	 * @param silent
 	 *
 	 * @returns New command
 	 */
 	async addCommand(
 		newCommandId: string,
 		newContents: string[],
+		place: Place,
 		msg?: Message,
 		silent?: boolean
 	): Promise<boolean> {
@@ -71,6 +80,7 @@ export default class extends BaseSubcommand {
 		const parse = await CustomCommand.customParseCommand(
 			this.client.database,
 			newCommandId,
+			place,
 			newContents,
 			msg
 		);
@@ -78,7 +88,10 @@ export default class extends BaseSubcommand {
 		// If the user didn't enter the command right, show help
 		if (!parse) {
 			if (msg && !silent) {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 			}
 			return false;
 		}
@@ -112,6 +125,8 @@ export default class extends BaseSubcommand {
 		try {
 			command = commandRepo.create({
 				id: newCommandId.toLocaleLowerCase(),
+				placeId: place.id,
+				platform: place.platform,
 				response: response,
 				group: defaultGroup,
 				defaultPrefix: prefix,

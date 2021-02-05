@@ -42,17 +42,14 @@ export default class extends BaseSubcommand {
 
 				const embed = EmbedHelper.getTemplate(
 					msg.discord,
-					this.client.helpCommands,
-					this.id
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
 				)
 					.setTitle("Group List")
 					.setDescription(
 						oneLine`
 					Here are a list of groups found. Groups are designed to be
 					used on commands to be organized, and shown in commands such as \`${
-						helpPrefix
-							? helpPrefix
-							: this.client.defaultPrefix
+						helpPrefix ? helpPrefix : this.client.defaultPrefix
 					}${helpCommand?.id ? helpCommand.id : "help"}\`.`
 					)
 					.addField(

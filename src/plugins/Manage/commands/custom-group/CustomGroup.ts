@@ -19,7 +19,7 @@ export default class CustomGroup extends BaseCommand {
 			These groups are shown with commands in them, which can be set with this command.`,
 			examples: stripIndent`
 			\`{{prefix}}{{id}} add "🍎 Food Stuff"\`
-			\`{{prefix}}{{id}} set "Food Stuff" newcommand\`
+			\`{{prefix}}{{id}} set newcommand "Food Stuff"\`
 			\`{{prefix}}{{id}} edit "Food Stuff" "🍏 Food"\`
 			\`{{prefix}}{{id}} delete Food\`
 			\`{{prefix}}{{id}} list\``,
@@ -38,11 +38,7 @@ export default class CustomGroup extends BaseCommand {
 	}
 
 	async run(msg: Message): Promise<boolean> {
-		if (msg.discord) {
-			await PluginManager.sendHelpForCommand(msg);
-			return true;
-		}
-
+		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
 		return false;
 	}
 }

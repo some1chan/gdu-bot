@@ -1,4 +1,10 @@
-import { Message, BaseCommand, BaseSubcommand, PluginManager, Logger } from "@framedjs/core";
+import {
+	Message,
+	BaseCommand,
+	BaseSubcommand,
+	PluginManager,
+	Logger,
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 
 export default class extends BaseSubcommand {
@@ -16,7 +22,9 @@ export default class extends BaseSubcommand {
 
 	async run(msg: Message): Promise<boolean> {
 		// Checks for permission
-		if (!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)) {
+		if (
+			!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)
+		) {
 			this.baseCommand.sendPermissionErrorMessage(msg);
 			return false;
 		}
@@ -29,7 +37,10 @@ export default class extends BaseSubcommand {
 
 			// If there's no first or second argument, show help
 			if (parse.length < 2) {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 
@@ -37,10 +48,13 @@ export default class extends BaseSubcommand {
 			const parseSecondArg = Message.parseEmojiAndString(parse[1], []);
 
 			if (parseFirstArgs && parseSecondArg) {
-				const oldGroup = await this.client.database.findGroup(parseFirstArgs.newContent);
+				const oldGroup = await this.client.database.findGroup(
+					parseFirstArgs.newContent
+				);
 
 				if (!oldGroup) {
-					await msg.discord?.channel.send(oneLine`${msg.discord.author},
+					await msg.discord?.channel
+						.send(oneLine`${msg.discord.author},
 					I couldn't find a group with the name "${parseFirstArgs.newContent}"
 					to edit. Please make sure that the group exists.`);
 					return false;
@@ -54,25 +68,32 @@ export default class extends BaseSubcommand {
 						newEmote
 					);
 					if (newEmote) {
-						await msg.discord?.channel.send(oneLine`${msg.discord.author},
+						await msg.discord?.channel
+							.send(oneLine`${msg.discord.author},
 						I've renamed the group "${parseFirstArgs.newContent}" into
 						"${parseSecondArg.newContent}", and changed the emote to
 						"${parseSecondArg.newEmote}" successfully!`);
 					} else {
-						await msg.discord?.channel.send(oneLine`${msg.discord.author},
+						await msg.discord?.channel
+							.send(oneLine`${msg.discord.author},
 						I've renamed the group "${parseFirstArgs.newContent}" into
 						"${parseSecondArg.newContent}" successfully!`);
 					}
 				} catch (error) {
 					if (error instanceof ReferenceError) {
-						await msg.discord?.channel.send(`${msg.discord.author}, ${error.message}`);
+						await msg.discord?.channel.send(
+							`${msg.discord.author}, ${error.message}`
+						);
 					} else {
 						Logger.error(error.stack);
 					}
 					return false;
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 

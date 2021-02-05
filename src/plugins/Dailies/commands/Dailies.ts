@@ -6,7 +6,8 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "dailies",
-			prefixes: ["!"],
+			defaultPrefix: "!",
+			prefixes: ["."],
 			aliases: ["daily", "dailychallenge", "dc"],
 			about: "View what's the daily challenge, and how to participate.",
 		});
@@ -25,8 +26,7 @@ export default class extends BaseCommand {
 			if (msg.discord) {
 				const embed = EmbedHelper.getTemplate(
 					msg.discord,
-					this.client.helpCommands,
-					this.id
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
 				).setTitle("Daily Challenge");
 
 				switch (pageNum) {
@@ -80,12 +80,16 @@ export default class extends BaseCommand {
 						break;
 				}
 
+				const existingFooterText = embed.footer?.text
+					? embed.footer.text
+					: "";
+				const newFooterText = this.client.formatting.formatCommandNotation(
+					`Page ${pageNum}/${max} - Use {{prefix}}{{id}} [page number] to access a new page.`,
+					this,
+					await msg.getPlace()
+				);
 				embed.setFooter(
-					`${
-						embed.footer?.text ? embed.footer.text : ""
-					}\n${this.parseBasicFormatting(
-						oneLine`Page ${pageNum}/${max} - Use {{prefix}}{{id}} [page number] to access a new page.`
-					)}`,
+					`${existingFooterText}\n${newFooterText}`,
 					embed.footer?.iconURL
 				);
 				await msg.discord.channel.send(embed);

@@ -5,6 +5,7 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "setstreak",
+			defaultPrefix: "!",
 			about: "Set the streak of a user.",
 			description: oneLine`
 			Set the streak of a user.

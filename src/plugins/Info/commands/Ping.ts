@@ -41,8 +41,7 @@ export default class extends BaseCommand {
 
 			const embed = EmbedHelper.getTemplate(
 				msg.discord,
-				this.client.helpCommands,
-				this.id
+				await EmbedHelper.getCheckOutFooter(msg, this.id)
 			)
 				.setColor(EmbedHelper.getColorWithFallback(msg.discord.guild))
 				.setTitle("Latency Info").setDescription(stripIndent`

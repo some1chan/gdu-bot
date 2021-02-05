@@ -1,4 +1,10 @@
-import { Message, BasePlugin, BaseCommand, EmbedHelper, Logger } from "@framedjs/core";
+import {
+	Message,
+	BasePlugin,
+	BaseCommand,
+	EmbedHelper,
+	Logger,
+} from "@framedjs/core";
 import { commaListsAnd, oneLineCommaLists } from "common-tags";
 import { DateTime } from "luxon";
 
@@ -60,8 +66,7 @@ export default class extends BaseCommand {
 					// guild.setChannelPositions();
 					const embed = EmbedHelper.getTemplate(
 						msg.discord,
-						this.client.helpCommands,
-						this.id
+						await EmbedHelper.getCheckOutFooter(msg, this.id)
 					)
 						.setTitle("Server Stats")
 						.addField("Owner", owner, true)

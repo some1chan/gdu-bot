@@ -1,32 +1,34 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
-	EmbedHelper,
-	Message,
 	BasePlugin,
 	BaseCommand,
+	Discord,
+	EmbedHelper,
+	InlineOptions,
+	Message,
 	Logger,
+	Place,
 } from "@framedjs/core";
-import { oneLineInlineLists, stripIndent } from "common-tags";
+import { oneLine, oneLineInlineLists, stripIndents } from "common-tags";
 import { HelpData } from "@framedjs/core";
-import Discord from "discord.js";
 
 const data: HelpData[] = [
 	{
 		group: "Info",
 		// TODO: Sorting alphabetically should probably be done programatically
-		// commands: ["help", "usage", "info", "about", "ping"],
 		commands: ["about", "help", "ping"],
 	},
 	{
 		group: "Dailies",
-		// commands: ["dailies", "streaks", "alert", "casual"],
 		commands: [
 			"alert",
 			"casual",
+			"day",
 			"dailies",
 			"streaks",
 			"streaks all",
 			"streaks top",
+			"togglewarnings",
 		],
 	},
 	{
@@ -45,11 +47,11 @@ export default class Help extends BaseCommand {
 			id: "help",
 			aliases: ["h", "commands"],
 			about: "View help for certain commands and extra info.",
-			description: stripIndent`
+			description: stripIndents`
 			Shows a list of useful commands, or detail specific commands for you.
 			`,
 			usage: "[command]",
-			examples: stripIndent`
+			examples: stripIndents`
 			\`{{prefix}}{{id}}\`
 			\`{{prefix}}{{id}} poll\`
 			\`{{prefix}}{{id}} dailies\`
@@ -63,11 +65,10 @@ export default class Help extends BaseCommand {
 			if (msg.args[0]) {
 				// Sends help through Embed
 				if (msg.discord) {
-					const embeds = await Help.showHelpCommand(
+					const embeds = await Help.sendHelpForCommand(
 						msg.args,
 						msg,
-						this.id,
-						Help.getHelpEmbed
+						this.id
 					);
 					for await (const embed of embeds) {
 						await msg.discord.channel.send(embed);
@@ -86,45 +87,36 @@ export default class Help extends BaseCommand {
 	 * @param msg Framed message
 	 */
 	private async showHelpAll(msg: Message): Promise<boolean> {
-		const helpFields = await this.client.plugins.createHelpFields(data);
+		const helpFields = await this.client.plugins.createHelpFields(
+			data,
+			await msg.getPlace()
+		);
 
 		if (msg.discord && helpFields) {
 			const embed = EmbedHelper.getTemplate(
 				msg.discord,
-				this.client.helpCommands,
-				this.id
+				await EmbedHelper.getCheckOutFooter(msg, this.id)
 			)
 				.setTitle("Command Help")
 				.setDescription(
 					await Message.format(
-						stripIndent`
+						stripIndents`
 						For info about this bot, use the \`$(command about)\` command.
 						For info on certain commands, use \`$(command help) [command]\`, excluding brackets.
 						`,
-						this.client
+						this.client,
+						await msg.getPlace()
 					)
 				)
 				.addFields(helpFields)
 				.addField(
 					"🤖 Other Bots",
-					stripIndent`
+					stripIndents`
 					\`-help\` - <@234395307759108106> is used for music in the **<#760622055384547368>** voice channel.
 					`
 				);
-			// .addField(
-			// 	"Need a Custom Discord Bot?",
-			// 	oneLine`
-			// 		Send <@200340393596944384> a message on Discord!`
-			// );
 
-			try {
-				await msg.discord.channel.send(embed);
-			} catch (error) {
-				Logger.error(error.stack);
-				await msg.discord.channel.send(
-					`${msg.discord.author}, the embed size for help is too large! If this issue persists, contact the developer.`
-				);
-			}
+			await msg.discord.channel.send(embed);
 			return true;
 		}
 		return false;
@@ -136,38 +128,45 @@ export default class Help extends BaseCommand {
 	 * @param args Message arguments
 	 * @param msg Framed Message
 	 * @param id Command ID for embed
-	 * @param processFunction The function that will parse and create all embeds.
+	 * @param createHelpEmbed The function that will parse and create all embeds.
 	 */
-	static async showHelpCommand(
+	static async sendHelpForCommand(
 		args: string[],
 		msg: Message,
 		id: string,
-		processFunction: (
+		createHelpEmbed: (
 			msg: Message,
 			id: string,
 			newArgs: string[],
-			command: BaseCommand
-		) => Promise<Discord.MessageEmbed | undefined>
+			command: BaseCommand,
+			place: Place
+		) => Promise<Discord.MessageEmbed | undefined> = Help.createHelpEmbed
 	): Promise<Discord.MessageEmbed[]> {
-		const embeds: Discord.MessageEmbed[] = [];
 		if (msg.discord && args[0]) {
+			const embeds: Discord.MessageEmbed[] = [];
+
 			// Does a shallow clone of the array
 			const newArgs = [...args];
 			const command = newArgs.shift();
+
+			const place = await msg.getPlace();
 
 			if (command) {
 				// Goes through all matching commands. Hopefully, there's only one, but
 				// this allows for edge cases in where two plugins share the same command.
 				const matchingCommands = msg.client.plugins.getCommands(
-					command
+					command,
+					place
 				);
 
+				// Renders all potential help
 				for (const baseCommand of matchingCommands) {
-					const embed = await processFunction(
+					const embed = await createHelpEmbed(
 						msg,
 						id,
 						newArgs,
-						baseCommand
+						baseCommand,
+						place
 					);
 					if (embed) embeds.push(embed);
 				}
@@ -175,13 +174,13 @@ export default class Help extends BaseCommand {
 				// Handles database commands
 				const dbCommand = await msg.client.database.findCommand(
 					command,
-					msg.client.defaultPrefix
+					msg.client.defaultPrefix,
+					place
 				);
 				if (dbCommand) {
 					const embed = EmbedHelper.getTemplate(
 						msg.discord,
-						msg.client.helpCommands,
-						id
+						await EmbedHelper.getCheckOutFooter(msg, id)
 					);
 					// Shows the command/subcommand chain
 					// ex. .command add
@@ -198,8 +197,31 @@ export default class Help extends BaseCommand {
 					embeds.push(embed);
 				}
 			}
+
+			// Handles all the $() formatting all at once
+			const processingEmbeds: Promise<Discord.MessageEmbed>[] = [];
+			for (const embed of embeds) {
+				processingEmbeds.push(
+					msg.client.formatting.formatEmbed(embed, place)
+				);
+			}
+			const processedEmbeds = await Promise.allSettled(processingEmbeds);
+			const readyEmbeds: Discord.MessageEmbed[] = [];
+			for (const embed of processedEmbeds) {
+				switch (embed.status) {
+					case "rejected":
+						Logger.error(embed.reason);
+						break;
+					default:
+						readyEmbeds.push(embed.value);
+						break;
+				}
+			}
+
+			return readyEmbeds;
 		}
-		return embeds;
+
+		return [];
 	}
 
 	/**
@@ -210,18 +232,18 @@ export default class Help extends BaseCommand {
 	 * @param newArgs Message arguments
 	 * @param command BaseCommand
 	 */
-	static async getHelpEmbed(
+	static async createHelpEmbed(
 		msg: Message,
 		id: string,
 		newArgs: string[],
-		command: BaseCommand
+		command: BaseCommand,
+		place: Place
 	): Promise<Discord.MessageEmbed | undefined> {
 		if (!msg.discord) return undefined;
 
 		const embed = EmbedHelper.getTemplate(
 			msg.discord,
-			msg.client.helpCommands,
-			id
+			await EmbedHelper.getCheckOutFooter(msg, id)
 		);
 
 		// Get potential subcommand
@@ -236,7 +258,7 @@ export default class Help extends BaseCommand {
 
 		// Shows the command/subcommand chain
 		// ex. .command add
-		const commandRan = `${command.defaultPrefix}${
+		const commandRan = `${command.getDefaultPrefix(place)}${
 			command.id
 		} ${oneLineInlineLists`${subcommandIds}`}`.trim();
 		embed.setTitle(commandRan);
@@ -244,11 +266,18 @@ export default class Help extends BaseCommand {
 		// The command/subcommand that has the data needed
 		const primaryCommand = finalSubcommand ? finalSubcommand : command;
 
+		let {
+			about,
+			description,
+			examples,
+			notes,
+			usage,
+		} = primaryCommand.getCommandNotationFormatting(place);
+
 		// Get the description
-		let description = primaryCommand.description;
 		if (!description) {
-			if (primaryCommand.about) {
-				description = primaryCommand.about;
+			if (about) {
+				description = about;
 			} else {
 				description = `*No about or description set for the command.*`;
 			}
@@ -256,34 +285,68 @@ export default class Help extends BaseCommand {
 		embed.setDescription(description);
 
 		// Gets the usage text
-		if (primaryCommand.usage) {
-			const guideMsg = await Message.format(
-				`Type \`$(command default.bot.info usage)\` for important info.`,
-				msg.client
-			);
-			const usageMsg = `\`${commandRan} ${primaryCommand.usage}\``;
+		if (usage) {
+			const guideMsg = `Type \`$(command default.bot.info usage)\` for more info.`;
+			const usageMsg = `\`${commandRan} ${usage}\``;
 			embed.addField(
 				"Usage",
 				`${guideMsg}\n${usageMsg}`,
-				Help.useInline(primaryCommand, usageMsg)
+				Help.useInline(primaryCommand, "usage")
 			);
 		}
 
 		// Get the examples text
-		if (primaryCommand.examples) {
+		if (examples) {
 			embed.addField(
 				"Examples",
-				`Try copying and editing them!\n${primaryCommand.examples}`,
-				Help.useInline(primaryCommand, primaryCommand.examples)
+				`Try copying and editing them!\n${examples}`,
+				Help.useInline(primaryCommand, "examples")
 			);
 		}
 
-		return embed;
+		// Get the notes text
+		if (notes) {
+			embed.addField(
+				"Notes",
+				notes,
+				Help.useInline(primaryCommand, "notes")
+			);
+		}
+
+		return msg.client.formatting.formatEmbed(embed, place);
 	}
 
-	static useInline(command: BaseCommand, newString: string): boolean {
-		return command.inlineCharacterLimit
-			? newString.length <= command.inlineCharacterLimit
-			: command.inline;
+	/**
+	 * Use inline
+	 * @param command
+	 * @param index
+	 */
+	static useInline(
+		command: BaseCommand,
+		index: keyof InlineOptions
+	): boolean {
+		// If the whole this is set to a true/false value, return that
+		if (typeof command.inline == "boolean") {
+			return command.inline;
+		}
+
+		// Object means it's InlineOptions
+		if (typeof command.inline == "object") {
+			const enableAllUnlessSpecified =
+				command.inline.enableAllUnlessSpecified;
+			const inlineValue = command.inline[index];
+
+			// If enableAllUnlessSpecified is true, everything should pass as true,
+			// unless the inline value has been set to false (not true or undefined)
+			if (enableAllUnlessSpecified) {
+				return inlineValue != false;
+			} else {
+				// Return like normal
+				return inlineValue == true;
+			}
+		}
+
+		// If command.inline isn't set/was undefined, return false
+		return false;
 	}
 }

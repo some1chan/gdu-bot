@@ -1,4 +1,4 @@
-import { Logger, Message, PluginManager } from "@framedjs/core";
+import { Logger, Message, Place, PluginManager } from "@framedjs/core";
 import { BaseCommand } from "@framedjs/core";
 import { BaseSubcommand } from "@framedjs/core";
 import CustomCommand from "../CustomCommand";
@@ -31,12 +31,16 @@ export default class extends BaseSubcommand {
 			if (parse) {
 				const { newCommandId } = parse;
 				return (
-					(await this.deleteCommand(newCommandId, msg)) != undefined
+					(await this.deleteCommand(
+						newCommandId,
+						await msg.getPlace(true),
+						msg
+					)) != undefined
 				);
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg);
+		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
 		return false;
 	}
 
@@ -44,16 +48,19 @@ export default class extends BaseSubcommand {
 	 * Deletes a command.
 	 *
 	 * @param newCommandId Command ID string
+	 * @param place Place data. Should try to use non-default ID
 	 * @param msg Message object
 	 */
 	async deleteCommand(
 		newCommandId: string,
+		place: Place,
 		msg?: Message,
 		silent?: boolean
 	): Promise<void> {
 		const parse = await CustomCommand.customParseCommand(
 			this.client.database,
 			newCommandId,
+			place,
 			undefined,
 			msg
 		);
@@ -61,7 +68,10 @@ export default class extends BaseSubcommand {
 		// If the user didn't enter the command right, show help
 		if (!parse) {
 			if (msg && !silent) {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 			}
 			return;
 		}
@@ -88,9 +98,7 @@ export default class extends BaseSubcommand {
 			if (command) {
 				// Tries and deletes the command
 				try {
-					await this.client.database.deleteCommand(
-						command.id
-					);
+					await this.client.database.deleteCommand(command.id);
 
 					// Tries and deletes the response
 					// TODO: don't delete the command if there's anything else connected to it

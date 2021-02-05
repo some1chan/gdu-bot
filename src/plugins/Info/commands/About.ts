@@ -13,8 +13,7 @@ export default class extends BaseCommand {
 		if (msg.discord) {
 			const embed = EmbedHelper.getTemplate(
 				msg.discord,
-				this.client.helpCommands,
-				this.id
+				await EmbedHelper.getCheckOutFooter(msg, this.id)
 			)
 				.setTitle("About the Bot")
 				.setDescription(
@@ -41,7 +40,9 @@ export default class extends BaseCommand {
 			await msg.discord.channel.send(embed);
 			return true;
 		} else {
-			msg.send(`Pixel Pete is a collection of custom bots for Game Dev Underground.`);
+			msg.send(
+				`Pixel Pete is a collection of custom bots for Game Dev Underground.`
+			);
 		}
 		return false;
 	}

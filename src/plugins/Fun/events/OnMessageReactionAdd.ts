@@ -1,10 +1,16 @@
-import Discord from "discord.js";
-import { emotes, oneOptionMsg, optionEmotes } from "../Fun.plugin";
-import { BaseEvent, BasePlugin, Logger, Message } from "@framedjs/core";
-import Emoji from "node-emoji"; // Doing this only because Windows can't render emotes for some reason
+import { oneOptionMsg } from "../Fun.plugin";
+import {
+	BaseEvent,
+	BasePlugin,
+	Discord,
+	EmbedHelper,
+	FriendlyError,
+	Logger,
+	Message,
+} from "@framedjs/core";
+import Emoji from "node-emoji";
 import { oneLine } from "common-tags";
 import Poll from "../commands/Poll";
-// import util from "util";
 
 export default class extends BaseEvent {
 	constructor(plugin: BasePlugin) {
@@ -21,7 +27,6 @@ export default class extends BaseEvent {
 		user: Discord.User | Discord.PartialUser
 	): Promise<void> {
 		Logger.silly(`Reaction Add From: ${user.id}`);
-		// Logger.debug(`OnMsgRA: ${util.inspect(this)}`);
 
 		if (user.bot) return;
 
@@ -31,13 +36,13 @@ export default class extends BaseEvent {
 			// If the message this reaction belongs to was removed the fetching
 			// might result in an API error, which we need to handle
 			try {
+				Logger.debug("Fetching reaction...");
 				await reaction.fetch();
 			} catch (error) {
 				Logger.error(
 					"Something went wrong when fetching the message: ",
 					error.stack
 				);
-				// Return as `reaction.message.author` may be undefined/null
 				return;
 			}
 		}
@@ -49,55 +54,82 @@ export default class extends BaseEvent {
 		const isPollEmbed: boolean | undefined = embedDescription?.includes(
 			"poll by <@"
 		);
-
+		const place = Message.discordGetPlace(
+			this.client,
+			reaction.message.guild
+		);
+		const commandRan = await this.client.formatting.format(
+			`$(command poll)`,
+			place
+		);
 		const newContent = `${reaction.message.content
-			.replace("poll:", ".poll")
+			.replace(
+				"poll:",
+				await this.client.formatting.format(commandRan, place)
+			)
 			.trim()}`;
 
-		const parsedResults = await Poll.customParse(
-			new Message({
-				client: this.client,
-				content: newContent,
-				discord: {
-					client: reaction.message.client,
-					id: reaction.message.id,
-					channel: reaction.message.channel,
-					author: reaction.message.author,
-					guild: reaction.message.guild,
-				},
-			}),
-			true
-		);
+		const newMsg = new Message({
+			client: this.client,
+			content: newContent,
+			discord: {
+				client: reaction.message.client,
+				id: reaction.message.id,
+				channel: reaction.message.channel,
+				author: reaction.message.author,
+				guild: reaction.message.guild,
+			},
+		});
+		await newMsg.getMessageElements();
+		const parsedResults = await Poll.customParse(newMsg, true);
 
 		const singleVoteOnly: boolean | undefined =
 			embedDescription?.endsWith(oneOptionMsg.toLocaleLowerCase()) ||
-			parsedResults?.askingForOnce;
+			parsedResults?.onceMultipleOption == "once";
 
 		const isPollCommand =
-			reaction.message.content.startsWith(".poll") ||
+			reaction.message.content.startsWith(commandRan) ||
 			reaction.message.content.startsWith("poll:") ||
 			isPollEmbed;
 
 		if (isPollCommand && singleVoteOnly) {
+			// Gets cached users from reactions
+			const fetches = [];
+			for (const extraReaction of reaction.message.reactions.cache) {
+				const reaction = extraReaction[1];
+				if (reaction.users.cache.size != reaction.count) {
+					Logger.silly("User count discrepancy found:");
+					Logger.silly(
+						`  reaction.users.cache.size: ${reaction.users.cache.size}`
+					);
+					Logger.silly(`  reaction.count: ${reaction.count}`);
+					fetches.push(reaction.users.fetch({}));
+				}
+			}
+			try {
+				await Promise.all(fetches);
+			} catch (error) {
+				Logger.error(error.stack);
+			}
+
 			// https://discordjs.guide/popular-topics/reactions.html#removing-reactions-by-user
 			const extraUserReactions = reaction.message.reactions.cache.filter(
 				extraReaction => {
 					const userHasReaction = extraReaction.users.cache.has(
 						user.id
 					);
-					const isSimplePollReaction = emotes.includes(
-						extraReaction.emoji.name
-					);
-					const isOptionPollReaction = optionEmotes.includes(
-						extraReaction.emoji.name
-					);
-					const extraReactionIsntJustPlaced =
-						extraReaction != reaction;
+					const isSimplePollReaction = isPollEmbed != true;
+					// Generous/lazy check that tries to get all valid options from the embed
+					const isOptionPollReaction =
+						embedDescription?.includes(extraReaction.emoji.name) ==
+							true && isPollEmbed == true;
+					const extraReactionJustPlaced =
+						extraReaction.emoji.name == reaction.emoji.name;
 
 					return (
 						userHasReaction &&
 						(isSimplePollReaction || isOptionPollReaction) &&
-						extraReactionIsntJustPlaced
+						!extraReactionJustPlaced
 					);
 				}
 			);
@@ -107,17 +139,37 @@ export default class extends BaseEvent {
 					Current reaction: ${reaction.emoji.name} 
 					(${Emoji.unemojify(reaction.emoji.name)} unemojified)`);
 
-				for await (const reaction of extraUserReactions.values()) {
-					Logger.silly(oneLine`
-						Removing ${reaction.emoji.name} 
-						(${Emoji.unemojify(reaction.emoji.name)} unemojified)`);
-					await reaction.users.remove(user.id);
+				const botMember = reaction.message.guild
+					? reaction.message.guild?.me
+					: null;
+
+				if (!(reaction.message.channel instanceof Discord.DMChannel)) {
+					for await (const reaction of extraUserReactions.values()) {
+						if (
+							!(
+								botMember &&
+								botMember.hasPermission(["MANAGE_MESSAGES"])
+							)
+						) {
+							throw new FriendlyError(
+								"The bot doesn't have the `MANAGE_MESSAGES` permission on this server!",
+								"Bot Missing Permissions"
+							);
+						}
+						Logger.silly(oneLine`
+							Removing ${reaction.emoji.name} 
+							(${Emoji.unemojify(reaction.emoji.name)} unemojified)`);
+						await reaction.users.remove(user.id);
+					}
 				}
 			} catch (error) {
-				if (!(reaction.message.channel instanceof Discord.DMChannel)) {
-					Logger.error(
-						`Failed to remove reactions, where it should\n${error.stack}`
-					);
+				if (error instanceof FriendlyError) {
+					const embed = EmbedHelper.getTemplate(reaction.message)
+						.setTitle(error.friendlyName)
+						.setDescription(error.message);
+					await reaction.message.channel.send(embed);
+				} else {
+					Logger.error(error.stack);
 				}
 			}
 		}

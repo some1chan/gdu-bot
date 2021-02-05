@@ -1,22 +1,14 @@
 import { BaseCommand, BasePlugin, Message } from "@framedjs/core";
-import { oneLine, stripIndent } from "common-tags";
+import { oneLine } from "common-tags";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
-			id: "setmercies",
+			id: "togglewarnings",
 			defaultPrefix: "!",
-			about: "Set the mercies of a user.",
+			about: `Toggles streak warnings.`,
 			description: oneLine`
-			Set the mercies of a user.
-			The user parameter can be a mention or user ID.
-			The number is the mercies amount.
-			`,
-			usage: `<user> <number>`,
-			examples: stripIndent`
-			\`{{prefix}}{{id}} @Gman1cus 4\` 
-			\`{{prefix}}{{id}} 474802647602561056 6\`
-			`,
+			Toggles streak warnings, for when your streak is about to be lost.`,
 		});
 	}
 

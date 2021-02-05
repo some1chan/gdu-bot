@@ -1,4 +1,10 @@
-import { EmbedHelper, Message, BasePlugin, BaseCommand, Logger } from "@framedjs/core";
+import {
+	EmbedHelper,
+	Message,
+	BasePlugin,
+	BaseCommand,
+	Logger,
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 import { HelpData } from "@framedjs/core";
 
@@ -6,6 +12,10 @@ const data: HelpData[] = [
 	{
 		group: "Info",
 		commands: ["info", "server"],
+	},
+	{
+		group: "Dailies",
+		commands: ["bumpstreak", "setmercies", "setstreak"],
 	},
 	{
 		group: "Manage",
@@ -26,11 +36,7 @@ const data: HelpData[] = [
 	},
 	{
 		group: "Utilities",
-		commands: ["avatar", "link", "multi", "render"],
-	},
-	{
-		group: "Dailies",
-		commands: ["bumpstreak", "setmercies", "setstreak"],
+		commands: ["link", "multi", "nickname", "render", "setavatar"],
 	},
 ];
 
@@ -48,7 +54,11 @@ export default class extends BaseCommand {
 	}
 
 	private async showHelpAll(msg: Message): Promise<boolean> {
-		const helpFields = await this.client.plugins.createHelpFields(data);
+		const place = await msg.getPlace();
+		const helpFields = await this.client.plugins.createHelpFields(
+			data,
+			place
+		);
 
 		if (msg.discord && helpFields) {
 			let modRoleString = msg.discord.guild?.roles.cache
@@ -65,14 +75,20 @@ export default class extends BaseCommand {
 				communitySupportRole = "<@&758771336289583125>";
 			}
 
-			const embed = EmbedHelper.getTemplate(msg.discord, this.client.helpCommands, this.id)
-				.setTitle("Mod Command Help")
-				.setDescription(
-					oneLine`
+			const embed = await this.client.formatting.formatEmbed(
+				EmbedHelper.getTemplate(
+					msg.discord,
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
+				)
+					.setTitle("Mod Command Help")
+					.setDescription(
+						oneLine`
 						These are commands designed mostly for
 						${modRoleString} and ${communitySupportRole} only.`
-				)
-				.addFields(helpFields);
+					)
+					.addFields(helpFields),
+				place
+			);
 
 			try {
 				await msg.discord.channel.send(embed);

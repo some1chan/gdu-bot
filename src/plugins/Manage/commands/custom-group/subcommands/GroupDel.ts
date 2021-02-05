@@ -1,4 +1,10 @@
-import { Message, BaseCommand, BaseSubcommand, PluginManager, Logger } from "@framedjs/core";
+import {
+	Message,
+	BaseCommand,
+	BaseSubcommand,
+	PluginManager,
+	Logger,
+} from "@framedjs/core";
 import { oneLine } from "common-tags";
 
 export default class extends BaseSubcommand {
@@ -16,7 +22,9 @@ export default class extends BaseSubcommand {
 
 	async run(msg: Message): Promise<boolean> {
 		// Checks for permission
-		if (!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)) {
+		if (
+			!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)
+		) {
 			this.baseCommand.sendPermissionErrorMessage(msg);
 			return false;
 		}
@@ -36,14 +44,19 @@ export default class extends BaseSubcommand {
 						error instanceof ReferenceError ||
 						(error.message as string).includes("default group")
 					) {
-						await msg.discord?.channel.send(`${msg.discord.author}, ${error.message}`);
+						await msg.discord?.channel.send(
+							`${msg.discord.author}, ${error.message}`
+						);
 					} else {
 						Logger.error(error.stack);
 					}
 					return false;
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 

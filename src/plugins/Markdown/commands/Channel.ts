@@ -41,7 +41,10 @@ export default class extends BaseCommand {
 
 				const newContent = msg.getArgsContent();
 				if (newContent.length == 0) {
-					await PluginManager.sendHelpForCommand(msg);
+					await PluginManager.sendHelpForCommand(
+						msg,
+						await msg.getPlace()
+					);
 					return false;
 				}
 
@@ -51,8 +54,7 @@ export default class extends BaseCommand {
 				);
 				const embed = EmbedHelper.getTemplate(
 					msg.discord,
-					this.client.helpCommands,
-					this.id
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
 				);
 
 				if (newChannel) {

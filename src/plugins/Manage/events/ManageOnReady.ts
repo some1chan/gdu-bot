@@ -18,12 +18,19 @@ export default class extends BaseEvent {
 		});
 	}
 
-	async run(): Promise<void> {
+	async init(): Promise<void> {
+		// Hacky workaround to always run on Discord ready, since the ready event
+		// might have already happened before initializing
+		super.init();
+
 		await this.build();
 		if (!this.job) {
+			// Sets up the job
 			this.job = Schedule.scheduleJob(this.cron, () =>
 				this.setPresence()
 			);
+
+			// Then runs it immediately for start-up
 			this.setPresence();
 		} else {
 			Logger.warn(
@@ -32,10 +39,19 @@ export default class extends BaseEvent {
 		}
 	}
 
+	async run(): Promise<void> {
+		// Filler function, so no errors show up
+		return;
+	}
+
 	async build(): Promise<void> {
 		const help = await Message.format(
 			`$(command default.bot.info help) | `,
-			this.client
+			this.client,
+			{
+				id: "default",
+				platform: "none",
+			}
 		);
 		const names = [
 			`${help}Managing Streaks`,

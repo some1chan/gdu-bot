@@ -4,6 +4,7 @@ import {
 	BaseSubcommand,
 	PluginManager,
 	Logger,
+	FriendlyError,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
 
@@ -28,7 +29,21 @@ export default class extends BaseSubcommand {
 			return false;
 		}
 
-		if (msg.args) {
+		const place = await msg.getPlace();
+		const prefix = msg.client.place.getPlacePrefix(
+			"default",
+			place
+		);
+
+		if (!prefix) {
+			Logger.error("Prefix couldn't be found");
+			throw new FriendlyError(
+				oneLine`${msg.discord?.author}, I couldn't find the default prefix!
+				If this issue persists, please report this.`
+			);
+		}
+
+		if (msg.args && prefix) {
 			const argsContent = msg.getArgsContent([msg.args[0]]);
 			const parse = Message.getArgs(argsContent, {
 				quoteSections: "flexible",
@@ -36,20 +51,21 @@ export default class extends BaseSubcommand {
 
 			// If there's no first or second argument, show help
 			if (parse.length < 2) {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 
 			const parseFirstArgs = parse[0];
-			const parseSecondArg = Message.parseEmojiAndString(
-				parse[1],
-				[]
-			);
+			const parseSecondArg = Message.parseEmojiAndString(parse[1], []);
 
 			if (parseFirstArgs && parseSecondArg) {
 				const command = this.client.database.findCommand(
 					parseFirstArgs,
-					this.defaultPrefix
+					prefix,
+					place
 				);
 
 				if (!command) {
@@ -72,7 +88,8 @@ export default class extends BaseSubcommand {
 				try {
 					await this.client.database.setGroup(
 						parseFirstArgs,
-						newContent
+						newContent,
+						place
 					);
 					await msg.discord?.channel
 						.send(oneLine`${msg.discord.author},
@@ -88,7 +105,10 @@ export default class extends BaseSubcommand {
 					return false;
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 

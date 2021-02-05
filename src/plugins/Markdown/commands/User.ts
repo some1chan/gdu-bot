@@ -15,7 +15,7 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "user",
-			prefixes: [plugin.defaultPrefix, "d."],
+			prefixes: ["d."],
 			about: "Gets the user for Discord markdown formatting.",
 			description: oneLine`
 			Gets the user for Discord markdown formatting.
@@ -38,10 +38,16 @@ export default class extends BaseCommand {
 			if (msg.discord) {
 				// Makes sure newContent actually is a valid parameter
 				if (newContent && newContent.length == 0) {
-					await PluginManager.sendHelpForCommand(msg);
+					await PluginManager.sendHelpForCommand(
+						msg,
+						await msg.getPlace()
+					);
 					return false;
 				}
-				let newMemberOrUser: Discord.GuildMember | Discord.User | undefined;
+				let newMemberOrUser:
+					| Discord.GuildMember
+					| Discord.User
+					| undefined;
 
 				// Gets from a guild if it can. If not, fallback to getting from client.users
 				if (msg.discord.guild && msg.discord.guild.available) {
@@ -67,8 +73,7 @@ export default class extends BaseCommand {
 				if (newMemberOrUser) {
 					const embed = EmbedHelper.getTemplate(
 						msg.discord,
-						this.client.helpCommands,
-						this.id
+						await EmbedHelper.getCheckOutFooter(msg, this.id)
 					)
 						.setTitle("User Formatting")
 						.setDescription(`\`${newMemberOrUser}\``)

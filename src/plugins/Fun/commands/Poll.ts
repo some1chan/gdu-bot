@@ -1,40 +1,42 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
+	Argument,
 	BaseCommand,
 	BasePlugin,
-	Message,
+	Discord,
 	EmbedHelper,
 	PluginManager,
-	Argument,
 	Logger,
+	Message,
+	FriendlyError,
 } from "@framedjs/core";
-import Discord from "discord.js";
 import { emotes, oneOptionMsg, optionEmotes } from "../Fun.plugin";
 import { oneLine, stripIndents } from "common-tags";
+import * as Fun from "../../Fun/Fun.plugin";
 
 export default class Poll extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "poll",
-			about: "Create a quick poll through Discord.",
-			description: stripIndents`
-				Create a quick poll through Discord. 
-				
-				${oneLine`The \`once\` "choose one only" option will work for a while,
-				until the bot is restarted. Once restarted, you shouldn't trust the
-				poll votes for singular votes.`}
-				
-				${oneLine`For a lasting "choose one only" poll, please use a
-				website like [strawpoll.me](https://strawpoll.me) instead!`}
-				`,
+			about: oneLine`Create a quick poll through Discord.`,
+			description: oneLine`Create a quick poll through Discord.
+			${
+				process.env.PBP_DESCRIPTION_AD != undefined
+					? process.env.PBP_DESCRIPTION_AD
+					: ""
+			}`,
 			usage: '[once] <question> [..."options"]',
 			hideUsageInHelp: true,
 			examples: stripIndents`
-				\`{{prefix}}{{id}} Do you like pineapple on pizza?\` - Simple Poll
-				\`{{prefix}}{{id}} Rename \\"Pixel Pete\\"\` - Simple Poll With Quotes at the End
-				\`{{prefix}}{{id}} Ban Bim? "Yes" "Sure" "Why Not"\` - Custom Options
-				\`{{prefix}}{{id}} once PC or Console? "PC" "Console"\` - Choose One Only
-			`,
+			\`$(command ${plugin.id} poll) Do you like pancakes?\` - Simple poll
+			\`$(command ${plugin.id} poll) Pizza or burger? "🍕" "🍔"\` -  Custom reactions
+			\`$(command ${plugin.id} poll) Ban Bim? "Yes" "Sure" "Absolutely"\` - Embed poll		
+			\`$(command ${plugin.id} poll) Am I running out of poll ideas? "✅ Yes" "👍 Yep"\` - Custom reactions
+			\`$(command ${plugin.id} poll) once ANIME'S REAL, RIGHT? "Real" "Not real"\` - Choose once`,
+			notes: stripIndents`
+			The \`once\` option will work unless the bot is momentarily offline.
+			${oneLine`For a lasting "choose only once" poll, please use a website like
+			[strawpoll.me](https://strawpoll.me) instead!`}`,
 		});
 	}
 
@@ -42,106 +44,161 @@ export default class Poll extends BaseCommand {
 		if (msg.discord) {
 			const parseResults = await Poll.customParse(msg);
 			if (!parseResults) return false;
-			const askingForOnce = parseResults.askingForOnce;
+
 			const pollOptionArgs = parseResults.pollOptionArgs;
-			const questionContent = parseResults.questionContent;
+			const questionContent = parseResults.question;
 
 			// If there some poll options
 			if (pollOptionArgs.length >= 1) {
-				if (pollOptionArgs.length == 1) {
-					await msg.discord.channel.send(
-						`${msg.discord.author}, you need at least more than one option!`
-					);
-					return false;
-				}
-
-				// Create the description with results
-				const reactionEmotes: string[] = [];
-				let description = "";
-				let hasCodeBlock = false;
-
-				for (let i = 0; i < pollOptionArgs.length; i++) {
-					const element = pollOptionArgs[i];
-					hasCodeBlock = element.endsWith("```");
-					if (element) {
-						const reactionEmote = optionEmotes[i];
-						description += `${reactionEmote}  ${element}`;
-						// Logger.warn(`${i} + 1 = ${newArgs.length}`);
-						// If it's not the last element,
-						// If there's more than 7 elements
-						// If there isn't a codeblock to finish it off
-						// Remove the extra new line
-						if (i + 1 < pollOptionArgs.length) {
-							description += "\n";
-							if (
-								// Is the amount of options less than 8
-								pollOptionArgs.length < 8 &&
-								// Is the end of this option not a codeblock
-								!hasCodeBlock &&
-								// Is this option not the last one
-								i + 1 != pollOptionArgs.length
-							)
-								description += "\n";
-						}
-
-						reactionEmotes.push(reactionEmote);
-					}
-				}
-
-				// Sends and creates the embed
-				const embed = new Discord.MessageEmbed()
-					.setColor(EmbedHelper.getColorWithFallback(msg.discord.guild))
-					.setTitle(questionContent)
-					.setDescription(
-						`${description}${hasCodeBlock ? "" : "\n"}` +
-							`\nPoll by ${msg.discord.author}` +
-							`\n${askingForOnce ? oneOptionMsg : ""}`
-					);
-				const newMsg = await msg.discord.channel.send(embed);
-
-				// Does the reactions
-				const msgReact: Promise<Discord.MessageReaction>[] = [];
-				reactionEmotes.forEach(element => {
-					msgReact.push(newMsg.react(element));
-				});
-				try {
-					await Promise.all(msgReact);
-				} catch (error) {
-					if (error == "Unknown Message") {
-						Logger.warn(error);
-					} else {
-						Logger.error(error.stack);
-					}
-				}
-
-				return true;
+				return this.createEmbedPoll(msg, parseResults);
 			} else if (questionContent?.length > 0) {
-				// Reacts to a message
-				// newMsg obtains a message by either msg.discord.msg, or
-				// by getting the message through message ID
-				const newMsg = msg.discord.msg
-					? msg.discord.msg
-					: msg.discord.id
-					? msg.discord.channel.messages.cache.get(msg.discord.id)
-					: undefined;
-				if (newMsg) {
-					const msgReact: Promise<Discord.MessageReaction>[] = [];
-					if (newMsg) {
-						emotes.forEach(element => {
-							msgReact.push(newMsg.react(element));
-						});
-						await Promise.all(msgReact);
-					}
-				} else {
-					// Cannot be called through scripts, as there is no real message to react to
-					return false;
-				}
+				return this.createSimplePoll(msg);
 			} else {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 		}
+		return false;
+	}
+
+	/**
+	 *
+	 * @param msg
+	 * @param pollOptionsArgs
+	 * @param askingForOnce
+	 */
+	async createEmbedPoll(
+		msg: Message,
+		parseResults: {
+			onceMultipleOption: string;
+			question: string;
+			pollOptionArgs: string[];
+		}
+	): Promise<boolean> {
+		if (!msg.discord) return false;
+
+		const askingForOnce = parseResults.onceMultipleOption == "once";
+		const pollOptionArgs = parseResults.pollOptionArgs;
+		const questionContent = parseResults.question;
+
+		if (pollOptionArgs.length == 1) {
+			throw new FriendlyError(
+				`${msg.discord.author}, you need at least more than one option!`
+			);
+		} else if (pollOptionArgs.length > Fun.pollLimit) {
+			throw new FriendlyError(
+				`${msg.discord.author}, you can only have ${Fun.pollLimit} options or less. You have ${pollOptionArgs.length}!`
+			);
+		}
+
+		// Create the description with results
+		const reactionEmotes: string[] = [];
+		let description = "";
+		let hasCodeBlock = false;
+		let hasAnyNewContentInOptions = false;
+
+		for (let i = 0; i < pollOptionArgs.length; i++) {
+			const element = pollOptionArgs[i];
+			hasCodeBlock = element.endsWith("```");
+			if (element) {
+				const parse = Message.parseEmojiAndString(element);
+
+				const reactionEmote = parse.newEmote
+					? parse.newEmote
+					: optionEmotes[i];
+				description += `${reactionEmote}  ${parse.newContent}`;
+
+				if (parse.newContent.trim().length != 0) {
+					hasAnyNewContentInOptions = true;
+				}
+
+				// If it's not the last element,
+				// If there's more than 7 elements
+				// If there isn't a codeblock to finish it off
+				// Remove the extra new line
+				if (i + 1 < pollOptionArgs.length) {
+					description += "\n";
+					if (
+						// Is the amount of options less than 8
+						pollOptionArgs.length < 8 &&
+						// Is the end of this option not a codeblock
+						!hasCodeBlock &&
+						// Is this option not the last one
+						i + 1 != pollOptionArgs.length
+					)
+						description += "\n";
+				}
+
+				reactionEmotes.push(reactionEmote);
+			}
+		}
+
+		// Checks for any duplicates. If there is, throw an error
+		const testDuplicates: string[] = [];
+		for (const emote of reactionEmotes) {
+			if (!testDuplicates.includes(emote)) {
+				testDuplicates.push(emote);
+			} else {
+				throw new FriendlyError(
+					`${msg.discord.author}, you can't have a duplicate emote (${emote}) for a reaction!`
+				);
+			}
+		}
+
+		let newMsg: Discord.Message | undefined;
+
+		if (hasAnyNewContentInOptions) {
+			// Sends and creates the embed
+			const embed = EmbedHelper.getTemplate(
+				msg.discord,
+				await EmbedHelper.getCheckOutFooter(msg, this.id)
+			)
+				.setTitle(questionContent)
+				.setDescription(
+					`${description}${hasCodeBlock ? "" : "\n"}` +
+						`\nPoll by ${msg.discord.author}` +
+						`\n${askingForOnce ? oneOptionMsg : ""}`
+				)
+				.setFooter("");
+			newMsg = await msg.discord.channel.send(embed);
+		} else {
+			// Create a modified simple poll instead,
+			// by reusing the old msg
+			newMsg = msg.discord.msg;
+		}
+
+		// newMsg should never be undefined
+		if (!newMsg) {
+			throw new FriendlyError();
+		}
+
+		// Does the reactions
+		for await (const emoji of reactionEmotes) {
+			await newMsg.react(emoji);
+		}
+
 		return true;
+	}
+
+	async createSimplePoll(msg: Message): Promise<boolean> {
+		// Reacts to a message
+		// newMsg obtains a message by either msg.discord.msg, or
+		// by getting the message through message ID
+		const newMsg = msg.discord?.msg;
+
+		if (newMsg) {
+			const msgReact: Promise<Discord.MessageReaction>[] = [];
+			emotes.forEach(element => {
+				msgReact.push(newMsg.react(element));
+			});
+			await Promise.all(msgReact);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -154,9 +211,8 @@ export default class Poll extends BaseCommand {
 		silent?: boolean
 	): Promise<
 		| {
-				askingForOnce: boolean;
 				onceMultipleOption: string;
-				questionContent: string;
+				question: string;
 				pollOptionArgs: string[];
 		  }
 		| undefined
@@ -179,7 +235,8 @@ export default class Poll extends BaseCommand {
 
 		const isOnce = newContent.startsWith("once");
 		const isMultiple = newContent.startsWith("multiple");
-		const isOnceOrMultiple = isOnce || isMultiple;
+		const isMulti = newContent.startsWith("multi");
+		const isOnceOrMultiple = isOnce || isMultiple || isMulti;
 
 		// Removes the once/multiple parma from newContent
 		if (isOnceOrMultiple) {
@@ -187,12 +244,12 @@ export default class Poll extends BaseCommand {
 				onceMultipleOption = "once";
 			} else if (isMultiple) {
 				onceMultipleOption = "multiple";
+			} else if (isMulti) {
+				onceMultipleOption = "multi";
 			}
 
 			// Handles combined "once question"
-			newContent = newContent
-				.replace(`${onceMultipleOption} `, ``)
-				.replace(onceMultipleOption, "");
+			newContent = newContent.replace(`${onceMultipleOption} `, ``);
 
 			// If there is no content now, the argument was alone before.
 			// This means we can remove it from args
@@ -205,7 +262,7 @@ export default class Poll extends BaseCommand {
 		// while allowing for the question content to contain quotes.
 		let detailedArgs: Argument[] = [];
 		let elementExtracted: string;
-		let questionContent = "";
+		let question = "";
 		let lastElementQuoted = false;
 		do {
 			detailedArgs = Message.getDetailedArgs(newContent, {
@@ -241,12 +298,14 @@ export default class Poll extends BaseCommand {
 					if (lastElementQuoted && firstArg.wrappedInQuotes) {
 						extraSpace = " ";
 					}
-					questionContent += `${extraSpace}${elementExtracted}`;
+					question += `${extraSpace}${elementExtracted}`;
 					newContent = newContent.replace(elementExtracted, "");
 
 					lastElementQuoted = firstArg.wrappedInQuotes;
 				} else {
-					Logger.error("Poll.ts: lastArg is undefined, but should have exited earlier!");
+					Logger.error(
+						"Poll.ts: lastArg is undefined, but should have exited earlier!"
+					);
 					break;
 				}
 			} else {
@@ -256,22 +315,28 @@ export default class Poll extends BaseCommand {
 
 		const pollOptionArgs = Message.simplifyArgs(detailedArgs);
 
-		Logger.silly(`onceMultipleOption ${isOnceOrMultiple}`);
-		Logger.silly(`newArgs: "${newArgs}"`);
+		// If there's no question, add one from the option arguments.
+		// Those come from questions inside quotes
+		if (question.length == 0) {
+			const newQuestion = pollOptionArgs.shift();
+			if (newQuestion) {
+				question = newQuestion;
+			}
+		}
 
 		Logger.silly(stripIndents`
 			new Poll.ts: 
 			newContent: '${newContent}'
-			questionContent: '${questionContent}'
 			newArgs: '${newArgs}'
+
+			question: '${question}'
 			onceMultipleOption: '${onceMultipleOption}'
 			pollOptionsArgs: [${pollOptionArgs}]
 		`);
 
 		return {
-			askingForOnce: isOnceOrMultiple,
+			question,
 			onceMultipleOption,
-			questionContent,
 			pollOptionArgs,
 		};
 	}

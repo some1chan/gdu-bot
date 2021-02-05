@@ -16,7 +16,7 @@ export default class Raw extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "raw",
-			prefixes: [plugin.defaultPrefix, "d."],
+			prefixes: ["d."],
 			about: "Escapes all markdown in a message.",
 			description: oneLine`
 			Escapes all markdown in a message, including code blocks,
@@ -44,7 +44,11 @@ export default class Raw extends BaseCommand {
 
 		if (msg.discord?.guild && msg.args) {
 			const parse = await Raw.getNewMessage(msg, true);
-			return await Raw.showStrippedMessage(msg, this.id, parse?.newContent);
+			return await Raw.showStrippedMessage(
+				msg,
+				this.id,
+				parse?.newContent
+			);
 		}
 
 		return false;
@@ -119,7 +123,9 @@ export default class Raw extends BaseCommand {
 						}
 					});
 				} catch (error) {
-					Logger.error(`Unable to fetch messages in channel\n${error.stack}`);
+					Logger.error(
+						`Unable to fetch messages in channel\n${error.stack}`
+					);
 				}
 			}
 
@@ -188,18 +194,22 @@ export default class Raw extends BaseCommand {
 		if (msg.discord) {
 			const embed = EmbedHelper.getTemplate(
 				msg.discord,
-				msg.client.helpCommands,
-				id
+				await EmbedHelper.getCheckOutFooter(msg, id)
 			).setTitle("Raw Formatting");
 
 			// Handles contents
 			if (newContent && newContent?.length > 0) {
-				const newContentNoCodeblock = Discord.Util.escapeMarkdown(newContent, {
-					codeBlock: false,
-				});
+				const newContentNoCodeblock = Discord.Util.escapeMarkdown(
+					newContent,
+					{
+						codeBlock: false,
+					}
+				);
 				const newCleanContent = Discord.Util.escapeMarkdown(newContent);
-				const rawCommand = "$(command default.bot.utils.command.rawfile)";
-				const rawHastebin = "$(command default.bot.utils.command.rawhastebin)";
+				const rawCommand =
+					"$(command default.bot.utils.command.rawfile)";
+				const rawHastebin =
+					"$(command default.bot.utils.command.rawhastebin)";
 				let attachment: Discord.MessageAttachment;
 				let link = "";
 
@@ -213,11 +223,14 @@ export default class Raw extends BaseCommand {
 											oneLine`The message contains a codeblock, so it has been sent as a separate message.
 											Please note that it may not be completely accurate. If full accuracy is wanted, please
 											use \`${rawCommand}\` or \`${rawHastebin}\` instead.`,
-											msg.client
+											msg.client,
+											await msg.getPlace()
 										)
 									);
 									await msg.discord.channel.send(embed);
-									await msg.discord.channel.send(newCleanContent);
+									await msg.discord.channel.send(
+										newCleanContent
+									);
 									break;
 								default:
 									throw new Error();
@@ -281,7 +294,9 @@ export default class Raw extends BaseCommand {
 						);
 				}
 			} else {
-				await msg.discord.channel.send(`${msg.discord.author}, the message is empty!`);
+				await msg.discord.channel.send(
+					`${msg.discord.author}, the message is empty!`
+				);
 				return false;
 			}
 
@@ -303,7 +318,10 @@ export default class Raw extends BaseCommand {
 	static async getMessageFromSnowflake(
 		snowflake: string,
 		channels: Discord.Channel[],
-		commandChannel: Discord.TextChannel | Discord.NewsChannel | Discord.DMChannel
+		commandChannel:
+			| Discord.TextChannel
+			| Discord.NewsChannel
+			| Discord.DMChannel
 	): Promise<Discord.Message | undefined> {
 		let newMsg: Discord.Message | undefined;
 		if (snowflake) {
@@ -317,7 +335,10 @@ export default class Raw extends BaseCommand {
 					| Discord.TextChannel
 					| Discord.NewsChannel
 					| Discord.DMChannel;
-				if (commandChannel.type == "dm" && commandChannel.id != channel.id) {
+				if (
+					commandChannel.type == "dm" &&
+					commandChannel.id != channel.id
+				) {
 					continue;
 				}
 
@@ -331,7 +352,9 @@ export default class Raw extends BaseCommand {
 				try {
 					newMsg = await commandChannel.messages.fetch(snowflake);
 				} catch (error) {
-					Logger.warn(`Unable to find message with id "${snowflake}"`);
+					Logger.warn(
+						`Unable to find message with id "${snowflake}"`
+					);
 				}
 			}
 		}

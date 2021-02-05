@@ -1,4 +1,10 @@
-import { BasePlugin, BaseCommand, Message, MessageOptions, Logger } from "@framedjs/core";
+import {
+	BasePlugin,
+	BaseCommand,
+	Message,
+	MessageOptions,
+	Logger,
+} from "@framedjs/core";
 import { oneLine, stripIndents } from "common-tags";
 
 export default class Multi extends BaseCommand {
@@ -21,6 +27,11 @@ export default class Multi extends BaseCommand {
 			examples: stripIndents`
 			${section1}${section2}
 			`,
+			permissions: {
+				discord: {
+					permissions: ["MANAGE_GUILD"],
+				},
+			},
 		});
 	}
 
@@ -97,7 +108,10 @@ export default class Multi extends BaseCommand {
 				const lastCharIsEscaped = content[i - 2] == "\\";
 
 				// Check for the ;\n, or see it's the last character in the string
-				if ((secondLastCharSemicolon && !lastCharIsEscaped) || lastChar) {
+				if (
+					(secondLastCharSemicolon && !lastCharIsEscaped) ||
+					lastChar
+				) {
 					// Parses out the ;\n if it's there
 					if (secondLastCharSemicolon && !lastCharIsEscaped) {
 						arg = arg.slice(0, arg.length - 2);

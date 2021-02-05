@@ -34,7 +34,10 @@ export default class extends BaseCommand {
 			if (msg.discord) {
 				const newContent = msg.getArgsContent().split(" ")[0];
 				if (newContent.length == 0) {
-					await PluginManager.sendHelpForCommand(msg);
+					await PluginManager.sendHelpForCommand(
+						msg,
+						await msg.getPlace()
+					);
 					return false;
 				}
 
@@ -56,12 +59,13 @@ export default class extends BaseCommand {
 					});
 				}
 
-				const finalEmoji = discordEmoji ? discordEmoji : Emoji.emojify(normalEmoji);
+				const finalEmoji = discordEmoji
+					? discordEmoji
+					: Emoji.emojify(normalEmoji);
 
 				const embed = EmbedHelper.getTemplate(
 					msg.discord,
-					this.client.helpCommands,
-					this.id
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
 				)
 					.setTitle("Emoji Formatting")
 					.setDescription(`\`${finalEmoji}\``)

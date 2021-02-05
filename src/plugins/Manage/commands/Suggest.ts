@@ -1,14 +1,14 @@
 import {
-	Message,
 	BasePlugin,
 	BaseCommand,
+	Discord,
 	EmbedHelper,
+	Message,
 	PluginManager,
 	Logger,
 	Utils,
 } from "@framedjs/core";
 import { oneLine, stripIndent, stripIndents } from "common-tags";
-import Discord from "discord.js";
 
 export default class extends BaseCommand {
 	suggestionChannelId = process.env.SUGGEST_CHANNEL_ID
@@ -51,8 +51,7 @@ export default class extends BaseCommand {
 				if (suggestionChannel) {
 					const suggestionEmbed = EmbedHelper.getTemplate(
 						msg.discord,
-						this.client.helpCommands,
-						this.id
+						await EmbedHelper.getCheckOutFooter(msg, this.id)
 					);
 					suggestionEmbed
 						.setTitle("Suggestion")
@@ -84,14 +83,15 @@ export default class extends BaseCommand {
 
 					const thanksEmbed = EmbedHelper.getTemplate(
 						msg.discord,
-						this.client.helpCommands,
-						this.id
+						await EmbedHelper.getCheckOutFooter(msg, this.id)
 					)
 						.setTitle("Thank You for Your Suggestion!")
 						.setDescription(thanks)
 						.setFooter("");
 
-					const thankMsg = await msg.discord.channel.send(thanksEmbed);
+					const thankMsg = await msg.discord.channel.send(
+						thanksEmbed
+					);
 
 					try {
 						await msg.discord.msg?.react("👍");
@@ -106,7 +106,9 @@ export default class extends BaseCommand {
 						Logger.error(error.stack);
 					}
 				} else {
-					Logger.error(`Couldn't find channel with ID "${this.suggestionChannelId}"`);
+					Logger.error(
+						`Couldn't find channel with ID "${this.suggestionChannelId}"`
+					);
 					return false;
 				}
 
@@ -114,7 +116,7 @@ export default class extends BaseCommand {
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg);
+		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
 		return false;
 	}
 }

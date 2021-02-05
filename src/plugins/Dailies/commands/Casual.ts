@@ -5,6 +5,7 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "casual",
+			defaultPrefix: "!",
 			about: "Toggles casual mode.",
 			description: oneLine`
 			Casual mode allows you to be a streaker without the threat of losing your streak.

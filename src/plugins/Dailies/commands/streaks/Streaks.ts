@@ -7,6 +7,7 @@ export default class extends BaseCommand {
 		super(plugin, {
 			id: "streaks",
 			aliases: ["streak", "s"],
+			defaultPrefix: "!",
 			about: "View your streak, or another user's streak.",
 			description: oneLine`
 			View your streak, or another user's streak.

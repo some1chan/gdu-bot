@@ -33,7 +33,7 @@ export default class extends BaseCommand {
 			if (msg.args[0]) {
 				// Send info through Embed
 				if (msg.discord) {
-					const embeds = await Help.showHelpCommand(
+					const embeds = await Help.sendHelpForCommand(
 						msg.args,
 						msg,
 						this.id,
@@ -44,7 +44,10 @@ export default class extends BaseCommand {
 					}
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 			}
 		}
 		return false;
@@ -63,7 +66,13 @@ export default class extends BaseCommand {
 		newArgs: string[],
 		command: BaseCommand
 	): Promise<Discord.MessageEmbed | undefined> {
-		const embed = await Help.getHelpEmbed(msg, id, newArgs, command);
+		const embed = await Help.createHelpEmbed(
+			msg,
+			id,
+			newArgs,
+			command,
+			await msg.getPlace()
+		);
 
 		if (!msg.discord || !embed) return undefined;
 
@@ -76,27 +85,31 @@ export default class extends BaseCommand {
 				aliasString += `\`${alias}\`${newElementCharacter}`;
 			}
 			if (aliasString.length > 0) {
-				embed.addField("Aliases", aliasString, command.inline);
+				embed.addField(
+					"Aliases",
+					aliasString,
+					Help.useInline(command, "aliases")
+				);
 			}
 		}
 
 		// Handles prefixes
 		const prefixesStrings: string[] = [];
-		command.prefixes.forEach(prefix => {
+		command.getPrefixes(await msg.getPlace()).forEach(prefix => {
 			prefixesStrings.push(`\`${prefix}\``);
 		});
 		const prefixString = oneLineInlineLists`${prefixesStrings}`;
 		embed.addField(
 			"Prefixes",
 			prefixString,
-			Help.useInline(command, prefixString)
+			Help.useInline(command, "prefixes")
 		);
 
 		// Handles plugin IDs
 		embed.addField(
 			"Plugin ID",
 			`\`${command.plugin.id}\``,
-			Help.useInline(command, prefixString)
+			Help.useInline(command, "plugin")
 		);
 
 		return embed;

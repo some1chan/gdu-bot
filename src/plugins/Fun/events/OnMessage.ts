@@ -1,5 +1,4 @@
-import { BaseEvent, BasePlugin, Message } from "@framedjs/core";
-import Discord from "discord.js";
+import { BaseEvent, BasePlugin, Discord, Message } from "@framedjs/core";
 
 export default class extends BaseEvent {
 	constructor(plugin: BasePlugin) {
@@ -13,24 +12,30 @@ export default class extends BaseEvent {
 
 	async run(msg: Discord.Message): Promise<void> {
 		const legacyPollString = "poll:";
-		const pollCommandPrefix = this.plugin.commands.get("poll")
-			?.defaultPrefix;
+
+		const commandId = "poll";
+
+		const place = Message.discordGetPlace(
+			this.client,
+			msg.guild
+		);
+		const commandPrefix = this.plugin.commands
+			.get(commandId)
+			?.getDefaultPrefix(place);
 		const newContent = msg.content
-			.replace(legacyPollString, `${pollCommandPrefix}poll`)
+			.replace(legacyPollString, `${commandPrefix}${commandId}`)
 			.trim();
 
 		if (msg.content.startsWith(legacyPollString)) {
-			this.client.plugins.runCommand(
-				new Message({
-					client: this.client,
-					content: newContent,
-					discord: {
-						base: msg,
-					},
-				})
-			);
-		} else if (msg.content.toLocaleLowerCase().includes("tim is inno")) {
-			// await msg.channel.send(`${msg.author}, TIM IS GUILTY`);
+			const newMsg = new Message({
+				client: this.client,
+				content: newContent,
+				discord: {
+					base: msg,
+				},
+			});
+			await newMsg.getMessageElements();
+			this.client.plugins.runCommand(newMsg);
 		}
 	}
 }

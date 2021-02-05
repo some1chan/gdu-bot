@@ -38,7 +38,11 @@ export default class extends BaseCommand {
 			});
 			if (!plugin) {
 				throw new Error(
-					Utils.util.format(DatabaseManager.errorNotFound, "plugin", pluginId)
+					Utils.util.format(
+						DatabaseManager.errorNotFound,
+						"plugin",
+						pluginId
+					)
 				);
 			}
 
@@ -54,19 +58,22 @@ export default class extends BaseCommand {
 
 		// The rest of the data
 		const osArch = `${os.platform()}/${os.arch()}`;
-		const nodeEnvironment = process.env.NODE_ENV ? `${process.env.NODE_ENV}` : "";
+		const nodeEnvironment = process.env.NODE_ENV
+			? `${process.env.NODE_ENV}`
+			: "";
 		const uptimeText = this.secondsToDhms(uptime);
 		const ramUsage = process.memoryUsage().rss / 1024 / 1024;
 		const ramUsageText = `${Number(ramUsage).toFixed(1)}`;
 		const backEnd = backEndVersion ? `v${backEndVersion}` : "???";
-		const botVersion = `${msg.client.appVersion ? `v${msg.client.appVersion}` : "???"}`;
+		const botVersion = `${
+			msg.client.appVersion ? `v${msg.client.appVersion}` : "???"
+		}`;
 
 		if (msg.discord) {
 			const codeblock = "```";
 			const embed = EmbedHelper.getTemplate(
 				msg.discord,
-				this.client.helpCommands,
-				this.id
+				await EmbedHelper.getCheckOutFooter(msg, this.id)
 			).setTitle("Bot Stats").setDescription(stripIndent`
 				${codeblock}yml
 				Server:

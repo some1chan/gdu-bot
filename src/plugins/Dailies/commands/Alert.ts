@@ -5,6 +5,7 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "alert",
+			defaultPrefix: "!",
 			about: `Toggles streak alerts.`,
 			description: oneLine`
 			Toggles streak alerts. You will receive the <@&761514004723662849> role,

@@ -42,17 +42,21 @@ export default class extends BaseCommand {
 			let newContents = msg.getArgsContent();
 
 			if (newContents.trim().length == 0) {
-				await PluginManager.sendHelpForCommand(msg);
+				await PluginManager.sendHelpForCommand(
+					msg,
+					await msg.getPlace()
+				);
 				return false;
 			}
 
 			// Parses the codeblock characters out if they exist
 			const firstThreeCharacters = newContents.substring(0, 3);
+			const firstSixCharacters = newContents.substring(0, 6);
 			const lastThreeCharacters = newContents.substring(
 				newContents.length - 3,
 				newContents.length
 			);
-			if (firstThreeCharacters == "```json") {
+			if (firstSixCharacters == "```json") {
 				newContents = newContents.substring(7, newContents.length);
 			} else if (firstThreeCharacters == "```") {
 				newContents = newContents.substring(3, newContents.length);

@@ -15,7 +15,8 @@ import {
 	ResponseData,
 	DiscordUtils,
 	DiscohookOutputData,
-	Logger
+	Logger,
+	Place,
 } from "@framedjs/core";
 
 export default class CustomCommand extends BaseCommand {
@@ -46,7 +47,7 @@ export default class CustomCommand extends BaseCommand {
 	}
 
 	async run(msg: Message): Promise<boolean> {
-		await PluginManager.sendHelpForCommand(msg);
+		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
 		return false;
 	}
 
@@ -112,15 +113,19 @@ export default class CustomCommand extends BaseCommand {
 	 * Manages commands. To be used as a base for any command-related things,
 	 * such as adding, editing, or removing commands.
 	 *
+	 * @param databaseManager
 	 * @param newCommandId Command ID string
+	 * @param place Place data
 	 * @param newContents Contents to add, in an array
 	 * @param msg Message object
+	 * @param silent
 	 *
 	 * @returns Response and prefix entities, or undefined
 	 */
 	static async customParseCommand(
 		databaseManager: DatabaseManager,
 		newCommandId: string,
+		place: Place,
 		newContents?: string[],
 		msg?: Message,
 		silent?: boolean
@@ -151,13 +156,15 @@ export default class CustomCommand extends BaseCommand {
 			return undefined;
 		}
 
-		// Finds a command, but could also return undefined. This is intentional
-		const command = await commandRepo.findOne({
-			where: {
-				id: newCommandId,
-			},
-			relations: ["response"],
-		});
+		const [command, defaultPrefix] = await Promise.all([
+			commandRepo.findOne({
+				where: {
+					id: newCommandId,
+				},
+				relations: ["response"],
+			}),
+			databaseManager.getDefaultPrefix(place),
+		]);
 
 		let oldResponse: Response | undefined;
 		if (command) {
@@ -170,7 +177,6 @@ export default class CustomCommand extends BaseCommand {
 		}
 
 		// Uses the default prefix by default
-		const defaultPrefix = await databaseManager.getDefaultPrefix();
 		if (defaultPrefix) {
 			let newResponse: Response | undefined;
 
@@ -198,16 +204,14 @@ export default class CustomCommand extends BaseCommand {
 					i < newContents.length - (lastContent ? 1 : 0);
 					i++
 				) {
-					requests.push(DiscordUtils.getOutputData(newContents[i], true));
+					requests.push(
+						DiscordUtils.getOutputData(newContents[i], true)
+					);
 				}
 
 				const inputData: Array<string | DiscohookOutputData> = [];
 				const requestResults = await Promise.allSettled(requests);
-				for (
-					let i = 0;
-					i < requestResults.length - (lastContent ? 1 : 0);
-					i++
-				) {
+				for (let i = 0; i < requestResults.length; i++) {
 					const result = requestResults[i];
 					if (result.status == "fulfilled") {
 						inputData.push(result.value);
@@ -218,11 +222,7 @@ export default class CustomCommand extends BaseCommand {
 
 				// Gets all possible responses, excluding the description if it exists
 				const newList: ResponseData[] = [];
-				for (
-					let i = 0;
-					i < inputData.length - (lastContent ? 1 : 0);
-					i++
-				) {
+				for (let i = 0; i < inputData.length; i++) {
 					const element = inputData[i];
 					if (typeof element == "string") {
 						newList.push({

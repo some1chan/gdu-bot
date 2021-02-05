@@ -19,6 +19,7 @@ export default class extends BasePlugin {
 	}
 }
 
+//#region Exported Variables
 export const emotes = ["👍", "👎", "🤷"];
 export const optionEmotes = [
 	"🇦",
@@ -26,20 +27,25 @@ export const optionEmotes = [
 	"🇨",
 	"🇩",
 	"🇪",
+
 	"🇫",
 	"🇬",
 	"🇭",
 	"🇮",
 	"🇯",
+
 	"🇰",
 	"🇱",
 	"🇲",
 	"🇳",
 	"🇴",
+
 	"🇵",
 	"🇶",
 	"🇷",
 	"🇸",
 	"🇹",
 ];
-export const oneOptionMsg = "You can choose only one option."
+export const oneOptionMsg = "You can choose only once.";
+export const pollLimit = 10;
+//#endregion
