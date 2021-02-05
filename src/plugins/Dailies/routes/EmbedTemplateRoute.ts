@@ -10,7 +10,13 @@ export default class extends BaseRouter {
 	constructor(client: Client) {
 		super(client);
 
-		this.router.get("/api/v0/discord/embedtemplate", async ctx => {
+		this.router.get("/api/v0/discord/embedtemplate", async (ctx: {
+			query: {
+				footerUrl: string; commandUsed: string;
+			};
+			set: (arg0: string, arg1: string) => void;
+			body: string;
+		}) => {
 			const footerUrl = ctx.query.footerUrl || "";
 			const commandUsed = ctx.query.commandUsed || "";
 
@@ -22,9 +28,9 @@ export default class extends BaseRouter {
 			const place: Place = guild
 				? Message.discordGetPlace(client, guild, true)
 				: {
-						id: "default",
-						platform: "discord",
-				  };
+					id: "default",
+					platform: "discord",
+				};
 
 			const json = JSON.stringify(
 				EmbedHelper.getTemplateRaw(
