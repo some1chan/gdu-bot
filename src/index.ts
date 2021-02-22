@@ -60,28 +60,44 @@ async function start() {
 	//#region Connection Options
 	if (process.env.NODE_ENV == "development") {
 		try {
-			const ormconfig = require("../data/ormconfig");
+			const ormconfig = require("../data/ormconfig.ts");
 			if (ormconfig.default) {
 				connectionOptions = ormconfig.default;
 			} else {
 				connectionOptions = ormconfig;
 			}
 		} catch (error) {
-			// Gets any possible connection options from env
-			connectionOptions = await TypeORM.getConnectionOptions();
+			try {
+				const ormconfig = require("../data/ormconfig.json");
+				if (ormconfig.default) {
+					connectionOptions = ormconfig.default;
+				} else {
+					connectionOptions = ormconfig;
+				}
+			} catch (error) {
+				// Gets any possible connection options from env
+				connectionOptions = await TypeORM.getConnectionOptions();
+			}
 		}
 	} else {
 		try {
-			// Gets any possible connection options from env
-			connectionOptions = await TypeORM.getConnectionOptions();
-		} catch (error) {
-			// The above can't read ormconfig in the proper folder. This is a workaround;
-			// This code will require the ormconfig.{js,ts,json} file.
-			const ormconfig = require("../ormconfig");
+			const ormconfig = require("../data/ormconfig.json");
 			if (ormconfig.default) {
 				connectionOptions = ormconfig.default;
 			} else {
 				connectionOptions = ormconfig;
+			}
+		} catch (error) {
+			try {
+				const ormconfig = require("../data/ormconfig.js");
+				if (ormconfig.default) {
+					connectionOptions = ormconfig.default;
+				} else {
+					connectionOptions = ormconfig;
+				}
+			} catch (error) {
+				// Gets any possible connection options from env
+				connectionOptions = await TypeORM.getConnectionOptions();
 			}
 		}
 	}
