@@ -25,8 +25,8 @@ const data: HelpData[] = [
 		commands: [
 			"alert",
 			"casual",
-			"day",
 			"dailies",
+			"day",
 			"streaks",
 			"streaks all",
 			"streaks top",
