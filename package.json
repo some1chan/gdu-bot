@@ -20,7 +20,7 @@
     "url": "https://github.com/some1chan/gdu-bot/issues"
   },
   "dependencies": {
-    "@framedjs/core": "^0.3.0-next.4",
+    "@framedjs/core": "^0.3.0-next.5",
     "axios": "^0.21.1",
     "colors": "^1.4.0",
     "common-tags": "^1.8.0",
