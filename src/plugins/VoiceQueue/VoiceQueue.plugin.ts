@@ -43,7 +43,7 @@ export default class VoiceQueue extends BasePlugin {
 		if (discordClient) {
 			discordClient.on("voiceStateUpdate", async (oldState, newState) => {
 				try {
-					Logger.verbose("voiceStateUpdate");
+					Logger.debug("voiceStateUpdate");
 
 					const oldUserChannel = oldState.channel;
 					const newUserChannel = newState.channel;
