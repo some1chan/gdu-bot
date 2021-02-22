@@ -209,7 +209,7 @@ export default class extends BaseCommand {
 					),
 				]);
 				await msg.send(
-					`✅ I've moved the **${eventCategoryChannel}** channel up${extraMessage}.`
+					`✅ I've moved the **${eventCategoryChannel}** channel **up**${extraMessage}.`
 				);
 			}
 			this.debugOutput(this.sortChannelCategories(mainGuild));
