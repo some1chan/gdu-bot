@@ -6,18 +6,17 @@ import path from "path";
 import {
 	BaseCommand,
 	BasePlugin,
-	DatabaseManager,
-	Message,
-	PluginManager,
-	Command,
-	Prefix,
-	Response,
-	ResponseData,
+	BaseMessage,
 	DiscordUtils,
 	DiscohookOutputData,
 	Logger,
 	Place,
 } from "@framedjs/core";
+import { DatabaseManager } from "../../../../managers/DatabaseManager";
+import Command from "../../../../database/entities/Command";
+import Prefix from "../../../../database/entities/Prefix";
+import Response from "../../../../database/entities/Response";
+import { ResponseData } from "../../../../database/interfaces/ResponseData";
 
 export default class CustomCommand extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -32,7 +31,7 @@ export default class CustomCommand extends BaseCommand {
 			\`{{prefix}}{{id}} edit newcommand We've edited the message! "New description!"\`
 			\`{{prefix}}{{id}} delete newcommand\`
 			\`{{prefix}}{{id}} list\``,
-			permissions: {
+			userPermissions: {
 				discord: {
 					permissions: ["MANAGE_MESSAGES"],
 					// Mods, Community Manager
@@ -46,8 +45,8 @@ export default class CustomCommand extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
+	async run(msg: BaseMessage): Promise<boolean> {
+		await msg.sendHelpForCommand();
 		return false;
 	}
 
@@ -88,7 +87,7 @@ export default class CustomCommand extends BaseCommand {
 				.replace(newCommandId, "")
 				.trim();
 
-			const newArgs = Message.getArgs(newContent, {
+			const newArgs = BaseMessage.getArgs(newContent, {
 				quoteSections: "flexible",
 			});
 
@@ -127,7 +126,7 @@ export default class CustomCommand extends BaseCommand {
 		newCommandId: string,
 		place: Place,
 		newContents?: string[],
-		msg?: Message,
+		msg?: BaseMessage,
 		silent?: boolean
 	): Promise<
 		| {
@@ -229,12 +228,14 @@ export default class CustomCommand extends BaseCommand {
 							content: element,
 						});
 					} else {
-						newList.push({
-							content: element.content ? element.content : "",
-							discord: {
-								embeds: element.embeds,
-							},
-						});
+						for (const message of element.messages) {
+							newList.push({
+								content: message.data.content ?? "",
+								discord: {
+									embeds: message.data.embeds,
+								},
+							});
+						}
 					}
 				}
 

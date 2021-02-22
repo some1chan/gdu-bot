@@ -1,4 +1,4 @@
-import { Message, BasePlugin, BaseCommand } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -9,15 +9,15 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
+	async run(msg: BaseMessage): Promise<boolean> {
+		// Checks for permission manually
+		if (!this.hasPermission(msg, this.userPermissions)) {
+			await this.sendPermissionErrorMessage(msg);
 			return false;
 		}
 
 		if (msg.args) {
-			await msg.send("test"); // Uncomment me!
+			await msg.send("test");
 			return true;
 		}
 

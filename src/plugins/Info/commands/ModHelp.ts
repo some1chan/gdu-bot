@@ -1,43 +1,43 @@
 import {
-	EmbedHelper,
-	Message,
+	BaseMessage,
 	BasePlugin,
 	BaseCommand,
+	EmbedHelper,
 	Logger,
+	FriendlyError,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
 import { HelpData } from "@framedjs/core";
 
-const data: HelpData[] = [
-	{
-		group: "Info",
-		commands: ["info", "server"],
-	},
-	{
-		group: "Dailies",
-		commands: ["bumpstreak", "setmercies", "setstreak"],
-	},
-	{
-		group: "Manage",
-		commands: [
-			"command add",
-			"command edit",
-			"command delete",
-			"command list",
-			"group add",
-			"group edit",
-			"group delete",
-			"group list",
-		],
-	},
-	{
-		group: "Markdown",
-		commands: ["channel", "emoji", "user", "role", "raw"],
-	},
-	{
-		group: "Utilities",
-		commands: ["link", "multi", "nickname", "render", "setavatar"],
-	},
+const data: HelpData[][] = [
+	[
+		{
+			group: "Dailies",
+			commands: ["bumpstreak", "setmercies", "setstreak"],
+		},
+		{
+			group: "Voice Queue",
+			commands: ["queue"],
+		},
+		{
+			group: "GDU Utilities",
+			commands: ["toggleevent"],
+		},
+	],
+	[
+		{
+			group: "Manage",
+			commands: ["command", "group"],
+		},
+		{
+			group: "Markdown",
+			commands: ["channel", "emoji", "user", "role", "raw"],
+		},
+		{
+			group: "Utilities",
+			commands: ["link", "multi", "nickname", "render", "setavatar"],
+		},
+	],
 ];
 
 export default class extends BaseCommand {
@@ -49,14 +49,25 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		return this.showHelpAll(msg);
 	}
 
-	private async showHelpAll(msg: Message): Promise<boolean> {
+	private async showHelpAll(msg: BaseMessage): Promise<boolean> {
+		if (!msg.args) {
+			throw new FriendlyError();
+		}
+
+		const min = 1;
+		const max = 2;
+		const pageNum = Math.min(
+			Math.max(min, Number(msg.args[0] ?? min)),
+			max
+		);
+
 		const place = await msg.getPlace();
 		const helpFields = await this.client.plugins.createHelpFields(
-			data,
+			data[pageNum - 1],
 			place
 		);
 
@@ -88,6 +99,19 @@ export default class extends BaseCommand {
 					)
 					.addFields(helpFields),
 				place
+			);
+
+			const existingFooterText = embed.footer?.text
+				? embed.footer.text
+				: "";
+			const newFooterText = this.client.formatting.formatCommandNotation(
+				`Page ${pageNum}/${max} - Use {{prefix}}{{id}} [page number] to access a new page.`,
+				this,
+				await msg.getPlace()
+			);
+			embed.setFooter(
+				`${existingFooterText}\n${newFooterText}`,
+				embed.footer?.iconURL
 			);
 
 			try {

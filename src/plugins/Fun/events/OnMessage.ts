@@ -1,4 +1,4 @@
-import { BaseEvent, BasePlugin, Discord, Message } from "@framedjs/core";
+import { BaseEvent, BasePlugin, Discord, BaseMessage } from "@framedjs/core";
 
 export default class extends BaseEvent {
 	constructor(plugin: BasePlugin) {
@@ -15,10 +15,16 @@ export default class extends BaseEvent {
 
 		const commandId = "poll";
 
-		const place = Message.discordGetPlace(
-			this.client,
-			msg.guild
-		);
+		// Message.discordGetPlace, except it doesn't create a new Place if not found
+		// This is to workaround a bug in where the new Place is being created elsewhere
+		// but events will also try to create a new place too,
+		// thus creating duplicates and will error
+		const platformId = msg.guild?.id ?? "discord_default";
+		const place = this.client.provider.place.get(platformId);
+		if (!place) {
+			return;
+		}
+
 		const commandPrefix = this.plugin.commands
 			.get(commandId)
 			?.getDefaultPrefix(place);
@@ -27,7 +33,7 @@ export default class extends BaseEvent {
 			.trim();
 
 		if (msg.content.startsWith(legacyPollString)) {
-			const newMsg = new Message({
+			const newMsg = new BaseMessage({
 				client: this.client,
 				content: newContent,
 				discord: {
@@ -35,7 +41,7 @@ export default class extends BaseEvent {
 				},
 			});
 			await newMsg.getMessageElements();
-			this.client.plugins.runCommand(newMsg);
+			this.client.commands.run(newMsg);
 		}
 	}
 }

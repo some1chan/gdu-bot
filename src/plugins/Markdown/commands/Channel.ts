@@ -1,5 +1,5 @@
 import {
-	Message,
+	BaseMessage,
 	BasePlugin,
 	BaseCommand,
 	EmbedHelper,
@@ -23,13 +23,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.discord) {
 				if (!msg.discord.guild || msg.discord.channel.type == "dm") {
@@ -41,10 +35,7 @@ export default class extends BaseCommand {
 
 				const newContent = msg.getArgsContent();
 				if (newContent.length == 0) {
-					await PluginManager.sendHelpForCommand(
-						msg,
-						await msg.getPlace()
-					);
+					await msg.sendHelpForCommand();
 					return false;
 				}
 

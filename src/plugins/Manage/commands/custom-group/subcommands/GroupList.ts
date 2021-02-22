@@ -1,10 +1,13 @@
 import {
 	BaseCommand,
+	BaseMessage,
 	BaseSubcommand,
 	EmbedHelper,
-	Message,
+	FriendlyError,
+	Logger,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
+import { CustomClient } from "../../../../../structures/CustomClient";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {
@@ -15,13 +18,15 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (
-			!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)
-		) {
-			this.baseCommand.sendPermissionErrorMessage(msg);
-			return false;
+	async run(msg: BaseMessage): Promise<boolean> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
 		}
 
 		const groupRepo = this.client.database.groupRepo;
@@ -29,9 +34,9 @@ export default class extends BaseSubcommand {
 			let template = "";
 			const groups = await groupRepo.find();
 			groups.forEach(element => {
-				template += `${element.emote ? element.emote : "❔"} **${
-					element.name
-				}** - \`${element.id}\`\n`;
+				template += `${element.emote ?? "❔"} **${element.name}** - \`${
+					element.id
+				}\`\n`;
 			});
 
 			if (msg.discord) {
@@ -47,10 +52,9 @@ export default class extends BaseSubcommand {
 					.setTitle("Group List")
 					.setDescription(
 						oneLine`
-					Here are a list of groups found. Groups are designed to be
-					used on commands to be organized, and shown in commands such as \`${
-						helpPrefix ? helpPrefix : this.client.defaultPrefix
-					}${helpCommand?.id ? helpCommand.id : "help"}\`.`
+						Here are a list of groups found. Groups are designed to be
+						used on commands to be organized, and shown in commands such as
+						\`$(command help)\`.`
 					)
 					.addField(
 						"Layout",
@@ -65,7 +69,12 @@ export default class extends BaseSubcommand {
 							? template
 							: "There are no groups! Try `.group add` to create new groups."
 					);
-				await msg.discord?.channel.send(embed);
+				await msg.discord?.channel.send(
+					await msg.client.formatting.formatEmbed(
+						embed,
+						await msg.getPlace()
+					)
+				);
 				return true;
 			}
 		} else {

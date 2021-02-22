@@ -1,5 +1,5 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { Message, BasePlugin, BaseCommand } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
 import { stripIndent } from "common-tags";
 import Raw from "./Raw";
 
@@ -14,8 +14,9 @@ export default class extends BaseCommand {
 			examples: stripIndent`
 			\`{{prefix}}{{id}}\`
 			\`{{prefix}}{{id}} This ~~is~~ a **test**!\``,
-			permissions: {
+			userPermissions: {
 				discord: {
+					// Mods, Community Manager
 					roles: ["462342299171684364", "758771336289583125"],
 				},
 			},
@@ -24,7 +25,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (!this.hasPermission(msg)) {
 			await this.sendPermissionErrorMessage(msg);
 			return false;

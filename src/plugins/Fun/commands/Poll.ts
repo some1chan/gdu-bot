@@ -2,12 +2,12 @@
 import {
 	Argument,
 	BaseCommand,
+	BaseMessage,
 	BasePlugin,
 	Discord,
 	EmbedHelper,
 	PluginManager,
 	Logger,
-	Message,
 	FriendlyError,
 } from "@framedjs/core";
 import { emotes, oneOptionMsg, optionEmotes } from "../Fun.plugin";
@@ -29,9 +29,7 @@ export default class Poll extends BaseCommand {
 			hideUsageInHelp: true,
 			examples: stripIndents`
 			\`$(command ${plugin.id} poll) Do you like pancakes?\` - Simple poll
-			\`$(command ${plugin.id} poll) Pizza or burger? "🍕" "🍔"\` -  Custom reactions
 			\`$(command ${plugin.id} poll) Ban Bim? "Yes" "Sure" "Absolutely"\` - Embed poll		
-			\`$(command ${plugin.id} poll) Am I running out of poll ideas? "✅ Yes" "👍 Yep"\` - Custom reactions
 			\`$(command ${plugin.id} poll) once ANIME'S REAL, RIGHT? "Real" "Not real"\` - Choose once`,
 			notes: stripIndents`
 			The \`once\` option will work unless the bot is momentarily offline.
@@ -40,7 +38,7 @@ export default class Poll extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.discord) {
 			const parseResults = await Poll.customParse(msg);
 			if (!parseResults) return false;
@@ -54,10 +52,7 @@ export default class Poll extends BaseCommand {
 			} else if (questionContent?.length > 0) {
 				return this.createSimplePoll(msg);
 			} else {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 				return false;
 			}
 		}
@@ -71,7 +66,7 @@ export default class Poll extends BaseCommand {
 	 * @param askingForOnce
 	 */
 	async createEmbedPoll(
-		msg: Message,
+		msg: BaseMessage,
 		parseResults: {
 			onceMultipleOption: string;
 			question: string;
@@ -104,7 +99,7 @@ export default class Poll extends BaseCommand {
 			const element = pollOptionArgs[i];
 			hasCodeBlock = element.endsWith("```");
 			if (element) {
-				const parse = Message.parseEmojiAndString(element);
+				const parse = BaseMessage.parseEmojiAndString(element);
 
 				const reactionEmote = parse.newEmote
 					? parse.newEmote
@@ -183,7 +178,7 @@ export default class Poll extends BaseCommand {
 		return true;
 	}
 
-	async createSimplePoll(msg: Message): Promise<boolean> {
+	async createSimplePoll(msg: BaseMessage): Promise<boolean> {
 		// Reacts to a message
 		// newMsg obtains a message by either msg.discord.msg, or
 		// by getting the message through message ID
@@ -207,7 +202,7 @@ export default class Poll extends BaseCommand {
 	 * @param silent Should the bot send an error?
 	 */
 	static async customParse(
-		msg: Message,
+		msg: BaseMessage,
 		silent?: boolean
 	): Promise<
 		| {
@@ -227,7 +222,7 @@ export default class Poll extends BaseCommand {
 		}
 
 		let newContent = msg.getArgsContent();
-		const newArgs = Message.getArgs(newContent, {
+		const newArgs = BaseMessage.getArgs(newContent, {
 			quoteSections: "flexible",
 		});
 
@@ -265,7 +260,7 @@ export default class Poll extends BaseCommand {
 		let question = "";
 		let lastElementQuoted = false;
 		do {
-			detailedArgs = Message.getDetailedArgs(newContent, {
+			detailedArgs = BaseMessage.getDetailedArgs(newContent, {
 				quoteSections: "flexible",
 			});
 
@@ -313,7 +308,7 @@ export default class Poll extends BaseCommand {
 			}
 		} while (detailedArgs.length > 0);
 
-		const pollOptionArgs = Message.simplifyArgs(detailedArgs);
+		const pollOptionArgs = BaseMessage.simplifyArgs(detailedArgs);
 
 		// If there's no question, add one from the option arguments.
 		// Those come from questions inside quotes

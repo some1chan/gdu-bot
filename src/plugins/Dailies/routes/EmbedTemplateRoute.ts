@@ -1,56 +1,66 @@
-import {
-	BaseRouter,
-	Client,
-	EmbedHelper,
-	Message,
-	Place,
-} from "@framedjs/core";
+import { BaseRouter, Client, EmbedHelper, Logger } from "@framedjs/core";
+import util from "util";
 
 export default class extends BaseRouter {
 	constructor(client: Client) {
 		super(client);
 
-		this.router.get("/api/v0/discord/embedtemplate", async (ctx: {
-			query: {
-				footerUrl: string; commandUsed: string;
-			};
-			set: (arg0: string, arg1: string) => void;
-			body: string;
-		}) => {
-			const footerUrl = ctx.query.footerUrl || "";
-			const commandUsed = ctx.query.commandUsed || "";
-
-			const guild = this.client.discord?.client?.guilds.cache.get(
-				process.env.MAIN_GUILD_ID ? process.env.MAIN_GUILD_ID : ""
-			);
-			const guildColor = guild?.me?.displayColor;
-
-			const place: Place = guild
-				? Message.discordGetPlace(client, guild, true)
-				: {
-					id: "default",
-					platform: "discord",
+		this.router.get(
+			"/api/v0/discord/embedtemplate",
+			async (ctx: {
+				query: {
+					footerUrl: string;
+					commandUsed: string;
 				};
+				set: (arg0: string, arg1: string) => void;
+				body: string;
+			}) => {
+				// const footerUrl = ctx.query.footerUrl || "";
+				const commandUsed = ctx.query.commandUsed || "";
 
-			const embed = EmbedHelper.getTemplateRaw(
-				EmbedHelper.getColorWithFallback(undefined, guildColor),
-				await EmbedHelper.getCheckOutFooter(
-					client.formatting,
-					place,
-					client.helpCommands,
-					commandUsed
-				)
-			);
+				const guild = this.client.discord?.client?.guilds.cache.get(
+					process.env.MAIN_GUILD_ID ?? ""
+				);
+				const guildColor = guild?.me?.displayColor;
 
-			// Workaround to make dailies bot not freak out when the icon_url doesn't exist
-			embed.setFooter(`${embed.footer?.text ? embed.footer.text : ""}`, embed.footer?.iconURL ? embed.footer.iconURL : "");
+				// Message.discordGetPlace, except it doesn't create a new Place if not found
+				// This is to workaround a bug in where the new Place is being created elsewhere
+				// but events will also try to create a new place too,
+				// thus creating duplicates and will error
+				const platformId = guild?.id ?? "discord_default";
+				let place = this.client.provider.place.get(platformId);
+				if (!place) {
+					place = {
+						id: "default",
+						platform: "discord",
+					};
+				}
 
-			const json = JSON.stringify(
-				embed
-			);
+				Logger.debug(`MAIN_GUILD_ID: ${process.env.MAIN_GUILD_ID}`);
+				Logger.debug(`guild.id: ${guild?.id}`);
+				Logger.debug(`place: ${util.inspect(place)}`);
 
-			ctx.set("Content-Type", "application/json");
-			ctx.body = json;
-		});
+				const embed = EmbedHelper.getTemplateRaw(
+					EmbedHelper.getColorWithFallback(undefined, guildColor),
+					await EmbedHelper.getCheckOutFooter(
+						client.formatting,
+						place,
+						client.footer,
+						commandUsed
+					)
+				);
+
+				// Workaround to make dailies bot not freak out when the icon_url doesn't exist
+				embed.setFooter(
+					`${embed.footer?.text ?? ""}`,
+					embed.footer?.iconURL ?? ""
+				);
+
+				const json = JSON.stringify(embed);
+
+				ctx.set("Content-Type", "application/json");
+				ctx.body = json;
+			}
+		);
 	}
 }

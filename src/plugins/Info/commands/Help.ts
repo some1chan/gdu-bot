@@ -1,16 +1,18 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
-	BasePlugin,
 	BaseCommand,
+	BaseMessage,
+	BasePlugin,
 	Discord,
 	EmbedHelper,
+	FriendlyError,
 	InlineOptions,
-	Message,
 	Logger,
 	Place,
 } from "@framedjs/core";
 import { oneLine, oneLineInlineLists, stripIndents } from "common-tags";
 import { HelpData } from "@framedjs/core";
+import { CustomClient } from "../../../structures/CustomClient";
 
 const data: HelpData[] = [
 	{
@@ -60,7 +62,7 @@ export default class Help extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.args[0]) {
 				// Sends help through Embed
@@ -86,7 +88,7 @@ export default class Help extends BaseCommand {
 	 * Shows the help message for all commands
 	 * @param msg Framed message
 	 */
-	private async showHelpAll(msg: Message): Promise<boolean> {
+	private async showHelpAll(msg: BaseMessage): Promise<boolean> {
 		const helpFields = await this.client.plugins.createHelpFields(
 			data,
 			await msg.getPlace()
@@ -99,7 +101,7 @@ export default class Help extends BaseCommand {
 			)
 				.setTitle("Command Help")
 				.setDescription(
-					await Message.format(
+					await BaseMessage.format(
 						stripIndents`
 						For info about this bot, use the \`$(command about)\` command.
 						For info on certain commands, use \`$(command help) [command]\`, excluding brackets.
@@ -108,13 +110,7 @@ export default class Help extends BaseCommand {
 						await msg.getPlace()
 					)
 				)
-				.addFields(helpFields)
-				.addField(
-					"🤖 Other Bots",
-					stripIndents`
-					\`-help\` - <@234395307759108106> is used for music in the **<#760622055384547368>** voice channel.
-					`
-				);
+				.addFields(helpFields);
 
 			await msg.discord.channel.send(embed);
 			return true;
@@ -132,16 +128,26 @@ export default class Help extends BaseCommand {
 	 */
 	static async sendHelpForCommand(
 		args: string[],
-		msg: Message,
+		msg: BaseMessage,
 		id: string,
 		createHelpEmbed: (
-			msg: Message,
+			msg: BaseMessage,
 			id: string,
 			newArgs: string[],
 			command: BaseCommand,
 			place: Place
 		) => Promise<Discord.MessageEmbed | undefined> = Help.createHelpEmbed
 	): Promise<Discord.MessageEmbed[]> {
+		if (!(msg.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
+		}
+
 		if (msg.discord && args[0]) {
 			const embeds: Discord.MessageEmbed[] = [];
 
@@ -154,7 +160,7 @@ export default class Help extends BaseCommand {
 			if (command) {
 				// Goes through all matching commands. Hopefully, there's only one, but
 				// this allows for edge cases in where two plugins share the same command.
-				const matchingCommands = msg.client.plugins.getCommands(
+				const matchingCommands = msg.client.commands.getCommands(
 					command,
 					place
 				);
@@ -233,7 +239,7 @@ export default class Help extends BaseCommand {
 	 * @param command BaseCommand
 	 */
 	static async createHelpEmbed(
-		msg: Message,
+		msg: BaseMessage,
 		id: string,
 		newArgs: string[],
 		command: BaseCommand,
@@ -264,7 +270,7 @@ export default class Help extends BaseCommand {
 		embed.setTitle(commandRan);
 
 		// The command/subcommand that has the data needed
-		const primaryCommand = finalSubcommand ? finalSubcommand : command;
+		const primaryCommand = finalSubcommand ?? command;
 
 		let {
 			about,

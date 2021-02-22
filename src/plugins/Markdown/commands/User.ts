@@ -1,15 +1,14 @@
 import {
-	Message,
-	BasePlugin,
 	BaseCommand,
-	EmbedHelper,
+	BaseMessage,
+	BasePlugin,
+	Discord,
 	DiscordUtils,
-	PluginManager,
-	NotFoundError,
+	EmbedHelper,
 	Logger,
+	NotFoundError,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
-import Discord from "discord.js";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -25,23 +24,14 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		const newContent = msg.getArgsContent().trim();
 
 		if (msg.args) {
 			if (msg.discord) {
 				// Makes sure newContent actually is a valid parameter
 				if (newContent && newContent.length == 0) {
-					await PluginManager.sendHelpForCommand(
-						msg,
-						await msg.getPlace()
-					);
+					await msg.sendHelpForCommand();
 					return false;
 				}
 				let newMemberOrUser:

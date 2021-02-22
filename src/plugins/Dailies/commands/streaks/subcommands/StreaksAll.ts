@@ -1,4 +1,4 @@
-import { BaseCommand, BaseSubcommand, Message } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BaseSubcommand } from "@framedjs/core";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {
@@ -9,7 +9,7 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.discord) {
 			return true;
 		}

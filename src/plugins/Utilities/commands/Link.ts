@@ -1,12 +1,12 @@
 import {
-	Message,
-	BasePlugin,
 	BaseCommand,
+	BaseMessage,
+	BasePlugin,
+	Discord,
 	EmbedHelper,
 	Logger,
 } from "@framedjs/core";
 import Raw from "../../Markdown/commands/Raw";
-import Discord from "discord.js";
 import * as ShortenURL from "../utils/ShortenURL";
 
 export default class Link extends BaseCommand {
@@ -20,9 +20,9 @@ export default class Link extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (!this.hasPermission(msg)) {
-			this.sendPermissionErrorMessage(msg);
+			await this.sendPermissionErrorMessage(msg);
 		}
 
 		if (msg.discord) {
@@ -63,7 +63,7 @@ export default class Link extends BaseCommand {
 	}
 
 	static async getLink(
-		msg: Message,
+		msg: BaseMessage,
 		newContent?: string,
 		newMsg?: Discord.Message
 	): Promise<string | undefined> {

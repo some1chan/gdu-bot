@@ -1,12 +1,12 @@
 import { oneOptionMsg } from "../Fun.plugin";
 import {
 	BaseEvent,
+	BaseMessage,
 	BasePlugin,
 	Discord,
 	EmbedHelper,
 	FriendlyError,
 	Logger,
-	Message,
 } from "@framedjs/core";
 import Emoji from "node-emoji";
 import { oneLine } from "common-tags";
@@ -54,10 +54,15 @@ export default class extends BaseEvent {
 		const isPollEmbed: boolean | undefined = embedDescription?.includes(
 			"poll by <@"
 		);
-		const place = Message.discordGetPlace(
-			this.client,
-			reaction.message.guild
-		);
+		// Message.discordGetPlace, except it doesn't create a new Place if not found
+		// This is to workaround a bug in where the new Place is being created elsewhere
+		// but events will also try to create a new place too,
+		// thus creating duplicates and will error
+		const platformId = reaction.message.guild?.id ?? "discord_default";
+		const place = this.client.provider.place.get(platformId);
+		if (!place) {
+			return;
+		}
 		const commandRan = await this.client.formatting.format(
 			`$(command poll)`,
 			place
@@ -69,7 +74,7 @@ export default class extends BaseEvent {
 			)
 			.trim()}`;
 
-		const newMsg = new Message({
+		const newMsg = new BaseMessage({
 			client: this.client,
 			content: newContent,
 			discord: {

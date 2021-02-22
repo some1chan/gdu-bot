@@ -1,8 +1,8 @@
-import { Command, Message, PluginManager, Logger, Place } from "@framedjs/core";
-import { BaseCommand } from "@framedjs/core";
-import { BaseSubcommand } from "@framedjs/core";
-import { stripIndents } from "common-tags";
+import { BaseMessage, Logger, Place, FriendlyError, BaseCommand, BaseSubcommand } from "@framedjs/core";
+import { oneLine, stripIndents } from "common-tags";
 import CustomCommand from "../CustomCommand";
+import { CustomClient } from "../../../../../structures/CustomClient";
+import Command from "../../../../../database/entities/Command";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {
@@ -18,10 +18,10 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
 		if (!this.hasPermission(msg)) {
-			this.sendPermissionErrorMessage(msg);
+			await this.sendPermissionErrorMessage(msg);
 			return false;
 		}
 
@@ -43,7 +43,7 @@ export default class extends BaseSubcommand {
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
+		await msg.sendHelpForCommand();
 		return false;
 	}
 
@@ -63,9 +63,19 @@ export default class extends BaseSubcommand {
 		newCommandId: string,
 		newContents: string[],
 		place: Place,
-		msg?: Message,
+		msg?: BaseMessage,
 		silent?: boolean
 	): Promise<boolean> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
+		}
+
 		const connection = this.client.database.connection;
 		if (!connection) {
 			Logger.error("No connection to a database found!");
@@ -83,10 +93,7 @@ export default class extends BaseSubcommand {
 		// If the user didn't enter the command right, show help
 		if (!parse) {
 			if (msg && !silent) {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 			}
 			return false;
 		}

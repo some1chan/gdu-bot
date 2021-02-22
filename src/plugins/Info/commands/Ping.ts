@@ -1,4 +1,9 @@
-import { EmbedHelper, Message, BasePlugin, BaseCommand } from "@framedjs/core";
+import {
+	BaseMessage,
+	BasePlugin,
+	BaseCommand,
+	EmbedHelper,
+} from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {
@@ -9,7 +14,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.discord) {
 			const discordMsg = msg.discord.msg
 				? msg.discord.msg

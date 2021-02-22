@@ -1,10 +1,9 @@
 import {
-	BasePlugin,
 	BaseCommand,
+	BaseMessage,
+	BasePlugin,
 	Discord,
 	EmbedHelper,
-	Message,
-	PluginManager,
 	Logger,
 	Utils,
 } from "@framedjs/core";
@@ -29,13 +28,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args && msg.args.length > 0) {
 			// Things
 			const argsContent = msg.getArgsContent();
@@ -116,7 +109,7 @@ export default class extends BaseCommand {
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
+		await msg.sendHelpForCommand();
 		return false;
 	}
 }

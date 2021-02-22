@@ -1,16 +1,19 @@
+console.log("Starting bot... this might take a while.");
+
 // https://www.stefanjudis.com/today-i-learned/measuring-execution-time-more-precisely-in-the-browser-and-node-js/
 const startTime = process.hrtime();
 
+import { Logger, LoginOptions, Utils, version } from "@framedjs/core";
+import { CustomClient } from "./structures/CustomClient";
 import { TypeORMLogger } from "./logger/TypeORMLogger";
-import * as Framed from "@framedjs/core";
+import * as TypeORM from "typeorm";
 import Colors from "colors";
 import Winston from "winston";
 import fs from "fs";
 import path from "path";
-import { sep } from "path";
+import { DatabaseManager } from "./managers/DatabaseManager";
 
 // Sets up loggers
-const Logger = Framed.Logger;
 Logger.level = process.env.LOGGER_LEVEL ? process.env.LOGGER_LEVEL : "silly";
 const format = Winston.format;
 const DbLogger = Winston.createLogger({
@@ -44,37 +47,83 @@ try {
 	Logger.error(error.stack);
 }
 
-Logger.info(`${Framed.Utils.hrTimeElapsed(startTime)}s - Loaded imports.`);
+Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded imports.`);
 
 async function start() {
 	Logger.info(
-		`Starting GDU Bot v${appVersion}, currently running Framed.js v${Framed.version}.`
+		`Starting GDU Bot v${appVersion}, currently running Framed.js v${version}.`
 	);
 
-	console.log(Framed.DatabaseManager.defaultEntitiesPath)
+	// Get connection options, and adds the logger
+	let connectionOptions: TypeORM.ConnectionOptions;
 
-	// Get connection options, and add the logger
-	const connectionOptions = await Framed.TypeORM.getConnectionOptions();
+	//#region Connection Options
+	if (process.env.NODE_ENV == "development") {
+		try {
+			const ormconfig = require("../data/ormconfig");
+			if (ormconfig.default) {
+				connectionOptions = ormconfig.default;
+			} else {
+				connectionOptions = ormconfig;
+			}
+		} catch (error) {
+			// Gets any possible connection options from env
+			connectionOptions = await TypeORM.getConnectionOptions();
+		}
+	} else {
+		try {
+			// Gets any possible connection options from env
+			connectionOptions = await TypeORM.getConnectionOptions();
+		} catch (error) {
+			// The above can't read ormconfig in the proper folder. This is a workaround;
+			// This code will require the ormconfig.{js,ts,json} file.
+			const ormconfig = require("../ormconfig");
+			if (ormconfig.default) {
+				connectionOptions = ormconfig.default;
+			} else {
+				connectionOptions = ormconfig;
+			}
+		}
+	}
+
 	Object.assign(connectionOptions, {
-		database: `${__dirname}${sep}..${sep}data${sep}FramedDB.sqlite`,
-		entities: [Framed.DatabaseManager.defaultEntitiesPath],
 		logger: new TypeORMLogger(DbLogger, "all"),
 	});
+	//#endregion
 
-	// Initializes Client
-	const client = new Framed.Client({
-		defaultConnection: connectionOptions,
+	// Initializes Database
+	if (!(await TypeORM.createConnection(connectionOptions))) {
+		throw new ReferenceError(DatabaseManager.errorNotFound);
+	}
+
+	// Initializes the client
+	const client = new CustomClient({
 		defaultPrefix: process.env.DEFAULT_PREFIX,
-		defaultHelpCommands: [
+		footer: [
 			"$(command default.bot.info help)",
 			"$(command default.bot.fun poll)",
 			"$(command com.geekoverdrivestudio.dailies dailies)",
 		],
 		appVersion: appVersion,
+		discord: {
+			owners: ["200340393596944384"],
+		},
 	});
 
-	// Creates login data
-	const loginData: Framed.LoginOptions[] = [
+	// Load plugins
+	client.plugins.loadPluginsIn({
+		dirname: path.join(__dirname, "plugins"),
+		filter: /^(.+plugin)\.(js|ts)$/,
+		excludeDirs: /^(.*)\.(git|svn)$|^(.*)subcommands(.*)$/,
+	});
+	Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded custom plugins.`);
+
+	// Initializes DatabaseManager, and providers
+	await client.database.init();
+	await client.provider.init();
+
+	//#region Creates login data
+	const loginData: LoginOptions[] = [
 		{
 			type: "discord",
 			discord: {
@@ -110,54 +159,43 @@ async function start() {
 			},
 		});
 	}
-
-	// Load plugins
-	client.plugins.loadPluginsIn({
-		dirname: path.join(__dirname, "plugins"),
-		filter: /^(.+plugin)\.(js|ts)$/,
-		excludeDirs: /^(.*)\.(git|svn)$|^(.*)subcommands(.*)$/,
-	});
-
-	Logger.info(
-		`${Framed.Utils.hrTimeElapsed(startTime)}s - Loaded custom plugins.`
-	);
+	//#endregion
 
 	// Login
-	client.login(loginData).then(async () => {
-		Logger.info(
-			`Done (${Framed.Utils.hrTimeElapsed(startTime)}s)! Framed.js v${
-				Framed.version
-			} has been loaded.`
-		);
+	await client.login(loginData);
 
-		client.discord.client
-			?.generateInvite({
-				permissions: [
-					// Likely required for most bots
-					"SEND_MESSAGES",
+	const hrTimeElapsed = Utils.hrTimeElapsed(startTime);
+	Logger.info(
+		`Done (${hrTimeElapsed}s)! GDU Bot v${appVersion} (Framed.js v${version}) has been loaded.`
+	);
 
-					// Used in help command, but also allows the potential to use emojis from other servers
-					"USE_EXTERNAL_EMOJIS",
+	client.discord.client
+		?.generateInvite({
+			permissions: [
+				// Likely required for most bots
+				"SEND_MESSAGES",
 
-					// Used for getting old messages with polls, after a restart
-					"READ_MESSAGE_HISTORY",
+				// Used in help command, but also allows the potential to use emojis from other servers
+				"USE_EXTERNAL_EMOJIS",
 
-					// Reactions and embeds needed for polls
-					"ADD_REACTIONS",
-					"EMBED_LINKS",
+				// Used for getting old messages with polls, after a restart
+				"READ_MESSAGE_HISTORY",
 
-					// Extra permissions for just-in-case
-					"MANAGE_MESSAGES",
-					"VIEW_CHANNEL",
+				// Reactions and embeds needed for polls
+				"ADD_REACTIONS",
+				"EMBED_LINKS",
 
-					// CUSTOM BOT STUFF
-					// Needs to give user a role
-					"MANAGE_ROLES",
-				],
-			})
-			.then(link => Logger.info(`Generated bot invite link:\n${link}`))
-			.catch(Logger.error);
-	});
+				// Extra permissions for just-in-case
+				"MANAGE_MESSAGES",
+				"VIEW_CHANNEL",
+
+				// CUSTOM BOT STUFF
+				// Needs to give user a role
+				"MANAGE_ROLES",
+			],
+		})
+		.then(link => Logger.info(`Generated bot invite link:\n${link}`))
+		.catch(Logger.error);
 }
 
 start();

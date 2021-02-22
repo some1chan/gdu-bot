@@ -1,5 +1,5 @@
 import {
-	Message,
+	BaseMessage,
 	BasePlugin,
 	BaseCommand,
 	EmbedHelper,
@@ -16,13 +16,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.discord) {
 				if (msg.discord.guild) {

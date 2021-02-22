@@ -1,12 +1,12 @@
 import {
-	Message,
+	BaseMessage,
 	BaseCommand,
 	BaseSubcommand,
-	PluginManager,
 	Logger,
 	FriendlyError,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
+import { CustomClient } from "../../../../../structures/CustomClient";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {
@@ -20,20 +20,19 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (
-			!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)
-		) {
-			this.baseCommand.sendPermissionErrorMessage(msg);
-			return false;
+	async run(msg: BaseMessage): Promise<boolean> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
 		}
 
 		const place = await msg.getPlace();
-		const prefix = msg.client.place.getPlacePrefix(
-			"default",
-			place
-		);
+		const prefix = msg.client.provider.prefixes.get(place.id);
 
 		if (!prefix) {
 			Logger.error("Prefix couldn't be found");
@@ -45,21 +44,18 @@ export default class extends BaseSubcommand {
 
 		if (msg.args && prefix) {
 			const argsContent = msg.getArgsContent([msg.args[0]]);
-			const parse = Message.getArgs(argsContent, {
+			const parse = BaseMessage.getArgs(argsContent, {
 				quoteSections: "flexible",
 			});
 
 			// If there's no first or second argument, show help
 			if (parse.length < 2) {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 				return false;
 			}
 
 			const parseFirstArgs = parse[0];
-			const parseSecondArg = Message.parseEmojiAndString(parse[1], []);
+			const parseSecondArg = BaseMessage.parseEmojiAndString(parse[1], []);
 
 			if (parseFirstArgs && parseSecondArg) {
 				const command = this.client.database.findCommand(
@@ -105,10 +101,7 @@ export default class extends BaseSubcommand {
 					return false;
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 				return false;
 			}
 

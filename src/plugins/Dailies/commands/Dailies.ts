@@ -1,5 +1,5 @@
 /* eslint-disable no-irregular-whitespace */
-import { BaseCommand, BasePlugin, EmbedHelper, Message } from "@framedjs/core";
+import { BaseCommand, BasePlugin, EmbedHelper, BaseMessage } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {
@@ -13,13 +13,14 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
+			// WARNING: this uses zero-width spaces.
 			const bulletPoint = "​ **•** ​ ";
 			const min = 1;
 			const max = 2;
 			const pageNum = Math.min(
-				Math.max(min, Number(msg.args[0] ? msg.args[0] : min)),
+				Math.max(min, Number(msg.args[0] ?? min)),
 				max
 			);
 
@@ -33,7 +34,6 @@ export default class extends BaseCommand {
 					case 1:
 						embed
 							.setDescription(
-								// WARNING: this message uses zero-width spaces.
 								stripIndent`
 								${bulletPoint}Challenge yourself to do something every day! 
 								${bulletPoint}Every day, post about what you've been working on in <#692939668160774204>.
@@ -42,7 +42,7 @@ export default class extends BaseCommand {
 							)
 							.addField(
 								"Checking Streaks",
-								// WARNING: this message uses zero-width spaces.
+
 								stripIndent`
 								${bulletPoint}Use \`!streaks\` to check your own streaks!
 								${bulletPoint}If you want to check someone else's, try \`!streaks @User\`. 
@@ -54,7 +54,6 @@ export default class extends BaseCommand {
 						embed
 							.addField(
 								"Challenge Mode",
-								// WARNING: this message uses zero-width spaces.
 								stripIndent`
 								${bulletPoint}By default, you're in **Challenge Mode**! 
 								${bulletPoint}In this mode, post every day about what you've done.
@@ -63,7 +62,6 @@ export default class extends BaseCommand {
 							)
 							.addField(
 								"Casual Mode",
-								// WARNING: this message uses zero-width spaces.
 								stripIndent`
 								${bulletPoint}By using the command \`!casual\`, you can be in **Casual Mode**!
 								${bulletPoint}In this mode, you can post whenever, without the threat of losing your streak.

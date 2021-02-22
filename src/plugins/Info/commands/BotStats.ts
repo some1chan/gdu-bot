@@ -1,15 +1,17 @@
 import {
 	BaseCommand,
+	BaseMessage,
 	BasePlugin,
-	DatabaseManager,
 	EmbedHelper,
-	Message,
-	Plugin,
 	Logger,
 	Utils,
 	version as backEndVersion,
+	FriendlyError,
 } from "@framedjs/core";
-import { stripIndent } from "common-tags";
+import { oneLine, stripIndent } from "common-tags";
+import { CustomClient } from "../../../structures/CustomClient";
+import { DatabaseManager } from "../../../managers/DatabaseManager";
+import Plugin from "../../../database/entities/Plugin";
 import os from "os";
 
 export default class extends BaseCommand {
@@ -21,7 +23,17 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
+		}
+
 		// Attempts to find dailies version
 		let dailiesVersion = "???";
 		try {

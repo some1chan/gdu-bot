@@ -1,4 +1,4 @@
-import { BaseCommand, BasePlugin, Message } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {
@@ -15,7 +15,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.discord) {
 			// This has been intentionally left blank, since a
 			// separate bot written in Python handles this, instead.

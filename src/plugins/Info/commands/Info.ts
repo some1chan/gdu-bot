@@ -1,13 +1,12 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
-	Message,
-	BasePlugin,
 	BaseCommand,
-	PluginManager,
+	BaseMessage,
+	BasePlugin,
+	Discord,
 } from "@framedjs/core";
 import { oneLine, oneLineInlineLists, stripIndent } from "common-tags";
 import Help from "./Help";
-import Discord from "discord.js";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -28,7 +27,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.args[0]) {
 				// Send info through Embed
@@ -44,10 +43,7 @@ export default class extends BaseCommand {
 					}
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 			}
 		}
 		return false;
@@ -61,7 +57,7 @@ export default class extends BaseCommand {
 	 * @param command BaseCommand
 	 */
 	private async getHelpEmbed(
-		msg: Message,
+		msg: BaseMessage,
 		id: string,
 		newArgs: string[],
 		command: BaseCommand

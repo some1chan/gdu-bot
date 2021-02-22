@@ -1,11 +1,6 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { oneLine, stripIndent } from "common-tags";
-import {
-	PluginManager,
-	BaseCommand,
-	BasePlugin,
-	Message,
-} from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
 import path from "path";
 
 export default class CustomGroup extends BaseCommand {
@@ -23,7 +18,7 @@ export default class CustomGroup extends BaseCommand {
 			\`{{prefix}}{{id}} edit "Food Stuff" "🍏 Food"\`
 			\`{{prefix}}{{id}} delete Food\`
 			\`{{prefix}}{{id}} list\``,
-			permissions: {
+			userPermissions: {
 				discord: {
 					permissions: ["MANAGE_MESSAGES"],
 					// Mods, Community Manager
@@ -37,8 +32,8 @@ export default class CustomGroup extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
+	async run(msg: BaseMessage): Promise<boolean> {
+		await msg.sendHelpForCommand();
 		return false;
 	}
 }

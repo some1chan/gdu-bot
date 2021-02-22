@@ -1,11 +1,13 @@
 import {
-	Message,
+	BaseMessage,
 	BaseCommand,
 	BaseSubcommand,
 	PluginManager,
 	Logger,
+	FriendlyError,
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
+import { CustomClient } from "../../../../../structures/CustomClient";
 
 export default class extends BaseSubcommand {
 	constructor(command: BaseCommand) {
@@ -20,17 +22,19 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (
-			!this.baseCommand.hasPermission(msg, this.baseCommand.permissions)
-		) {
-			this.baseCommand.sendPermissionErrorMessage(msg);
-			return false;
+	async run(msg: BaseMessage): Promise<boolean> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
 		}
 
 		if (msg.args) {
-			const parse = Message.parseEmojiAndString(msg, [msg.args[0]]);
+			const parse = BaseMessage.parseEmojiAndString(msg, [msg.args[0]]);
 			if (parse) {
 				const { newContent } = parse;
 				try {
@@ -53,10 +57,7 @@ export default class extends BaseSubcommand {
 					return false;
 				}
 			} else {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 				return false;
 			}
 

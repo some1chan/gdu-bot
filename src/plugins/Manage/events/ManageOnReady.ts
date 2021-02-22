@@ -1,5 +1,10 @@
-import { BasePlugin, BaseEvent, Message, Logger } from "@framedjs/core";
-import Discord from "discord.js";
+import {
+	BaseEvent,
+	BaseMessage,
+	BasePlugin,
+	Discord,
+	Logger,
+} from "@framedjs/core";
 import Schedule from "node-schedule";
 
 export default class extends BaseEvent {
@@ -45,7 +50,7 @@ export default class extends BaseEvent {
 	}
 
 	async build(): Promise<void> {
-		const help = await Message.format(
+		const help = await BaseMessage.format(
 			`$(command default.bot.info help) | `,
 			this.client,
 			{

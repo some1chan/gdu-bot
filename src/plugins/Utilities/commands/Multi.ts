@@ -1,7 +1,7 @@
 import {
 	BasePlugin,
 	BaseCommand,
-	Message,
+	BaseMessage,
 	MessageOptions,
 	Logger,
 } from "@framedjs/core";
@@ -27,7 +27,7 @@ export default class Multi extends BaseCommand {
 			examples: stripIndents`
 			${section1}${section2}
 			`,
-			permissions: {
+			userPermissions: {
 				discord: {
 					permissions: ["MANAGE_GUILD"],
 				},
@@ -35,13 +35,7 @@ export default class Multi extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			const content = msg.getArgsContent();
 			const parsed = Multi.parse(content);
@@ -52,8 +46,8 @@ export default class Multi extends BaseCommand {
 					content: parse,
 					client: this.client,
 				};
-				const newMsg = new Message(info);
-				const results = await this.client.plugins.runCommand(newMsg);
+				const newMsg = new BaseMessage(info);
+				const results = await this.client.commands.run(newMsg);
 				let somethingWentWrong = false;
 
 				if (results.size == 0) {

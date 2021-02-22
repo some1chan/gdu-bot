@@ -1,15 +1,15 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
-	Message,
-	BasePlugin,
 	BaseCommand,
-	EmbedHelper,
+	BaseMessage,
+	BasePlugin,
+	Discord,
 	DiscordUtils,
+	EmbedHelper,
 	FriendlyError,
 	Logger,
 } from "@framedjs/core";
 import { oneLine, stripIndent, stripIndents } from "common-tags";
-import Discord from "discord.js";
 import Hastebin from "hastebin";
 
 export default class Raw extends BaseCommand {
@@ -26,8 +26,9 @@ export default class Raw extends BaseCommand {
 			examples: stripIndent`
 			\`{{prefix}}{{id}}\`
 			\`{{prefix}}{{id}} This ~~is~~ a **test**!\``,
-			permissions: {
+			userPermissions: {
 				discord: {
+					// Mods, Community Manager
 					roles: ["462342299171684364", "758771336289583125"],
 				},
 			},
@@ -36,7 +37,7 @@ export default class Raw extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (!this.hasPermission(msg)) {
 			await this.sendPermissionErrorMessage(msg);
 			return false;
@@ -60,13 +61,13 @@ export default class Raw extends BaseCommand {
 	 * @param silent
 	 */
 	static async getNewMessage(
-		msg: Message,
+		msg: BaseMessage,
 		silent?: boolean
 	): Promise<
 		| {
-				newMsg?: Discord.Message;
-				newContent: string;
-		  }
+			newMsg?: Discord.Message;
+			newContent: string;
+		}
 		| undefined
 	> {
 		if (msg.discord?.guild && msg.args) {
@@ -80,7 +81,7 @@ export default class Raw extends BaseCommand {
 			const snowflake = Discord.SnowflakeUtil.deconstruct(content.trim());
 			const validSnowflake =
 				snowflake.binary !=
-					"0000000000000000000000000000000000000000000000000000000000000000" &&
+				"0000000000000000000000000000000000000000000000000000000000000000" &&
 				/^\d+$/.test(content);
 			if (validSnowflake) {
 				snowflakeMsg = await Raw.getMessageFromSnowflake(
@@ -151,7 +152,9 @@ export default class Raw extends BaseCommand {
 					newContent = linkMsg.content;
 					newMsg = linkMsg;
 				} else {
-					throw linkError;
+					throw new Error(
+						`linkMsg is not an instance of Discord.Message`
+					);
 				}
 			} else if (content.length > 0) {
 				newContent = content;
@@ -186,7 +189,7 @@ export default class Raw extends BaseCommand {
 	 * @param mode Options to upload on
 	 */
 	static async showStrippedMessage(
-		msg: Message,
+		msg: BaseMessage,
 		id: string,
 		newContent: string | undefined,
 		mode: "file" | "hastebin" | "none" = "none"
@@ -219,7 +222,7 @@ export default class Raw extends BaseCommand {
 							switch (mode) {
 								case "none":
 									embed.setDescription(
-										await Message.format(
+										await BaseMessage.format(
 											oneLine`The message contains a codeblock, so it has been sent as a separate message.
 											Please note that it may not be completely accurate. If full accuracy is wanted, please
 											use \`${rawCommand}\` or \`${rawHastebin}\` instead.`,

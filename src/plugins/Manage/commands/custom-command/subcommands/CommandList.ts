@@ -1,12 +1,15 @@
 import {
-	Command,
 	EmbedHelper,
-	Message,
 	Logger,
+	FriendlyError,
+	BaseCommand,
+	BaseMessage,
+	BaseSubcommand,
 } from "@framedjs/core";
-import { BaseCommand } from "@framedjs/core";
-import { BaseSubcommand } from "@framedjs/core";
 import { oneLine, oneLineInlineLists } from "common-tags";
+import { Message } from "discord.js";
+import Command from "../../../../../database/entities/Command";
+import { CustomClient } from "../../../../../structures/CustomClient";
 
 interface Data {
 	noDescCommands: string[];
@@ -22,11 +25,21 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
 		if (!this.hasPermission(msg)) {
-			this.sendPermissionErrorMessage(msg);
+			await this.sendPermissionErrorMessage(msg);
 			return false;
+		}
+
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
 		}
 
 		if (msg.discord) {
@@ -36,7 +49,7 @@ export default class extends BaseSubcommand {
 			)
 				.setTitle("Command List")
 				.setDescription(
-					await Message.format(
+					await BaseMessage.format(
 						oneLine`
 						This is a list of custom commands.
 						To see the rest of the commands, use \`$(command default.bot.info help)\`.`,
@@ -61,7 +74,7 @@ export default class extends BaseSubcommand {
 			// Finds all commands, and adds them into an interface that contains both
 			// Description commands and no-description commands
 			for await (const command of commands) {
-				const groupEmote = command.group ? command.group.emote : "❔";
+				const groupEmote = command.group?.emote ?? "❔";
 				const groupDisplay = `${groupEmote} ${
 					command.group
 						? command.group.name

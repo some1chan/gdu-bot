@@ -1,6 +1,6 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import {
-	Message,
+	BaseMessage,
 	BasePlugin,
 	BaseCommand,
 	PluginManager,
@@ -25,7 +25,7 @@ export default class extends BaseCommand {
 			\`{{prefix}}{{id}} https://is.gd/ZJGQnw\`
 			\`{{prefix}}{{id}} https://share.discohook.app/go/xxxxxxxx\`			
 			`,
-			permissions: {
+			userPermissions: {
 				discord: {
 					roles: ["758771336289583125", "462342299171684364"],
 				},
@@ -33,19 +33,16 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (!this.hasPermission(msg)) {
-			this.sendPermissionErrorMessage(msg);
+			await this.sendPermissionErrorMessage(msg);
 		}
 
 		if (msg.discord && msg.args && msg.prefix && msg.command) {
 			let newContents = msg.getArgsContent();
 
 			if (newContents.trim().length == 0) {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 				return false;
 			}
 

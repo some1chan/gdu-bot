@@ -1,6 +1,13 @@
-import { Logger, Message, Place, PluginManager } from "@framedjs/core";
-import { BaseCommand } from "@framedjs/core";
+import {
+	BaseCommand,
+	BaseMessage,
+	FriendlyError,
+	Logger,
+	Place,
+} from "@framedjs/core";
 import { BaseSubcommand } from "@framedjs/core";
+import { oneLine } from "common-tags";
+import { CustomClient } from "../../../../../structures/CustomClient";
 import CustomCommand from "../CustomCommand";
 
 export default class extends BaseSubcommand {
@@ -14,10 +21,10 @@ export default class extends BaseSubcommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
+	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
 		if (!this.hasPermission(msg)) {
-			this.sendPermissionErrorMessage(msg);
+			await this.sendPermissionErrorMessage(msg);
 			return false;
 		}
 
@@ -40,7 +47,7 @@ export default class extends BaseSubcommand {
 			}
 		}
 
-		await PluginManager.sendHelpForCommand(msg, await msg.getPlace());
+		await msg.sendHelpForCommand();
 		return false;
 	}
 
@@ -54,9 +61,19 @@ export default class extends BaseSubcommand {
 	async deleteCommand(
 		newCommandId: string,
 		place: Place,
-		msg?: Message,
+		msg?: BaseMessage,
 		silent?: boolean
 	): Promise<void> {
+		if (!(this.client instanceof CustomClient)) {
+			Logger.error(
+				"CustomClient is needed! This code needs a reference to DatabaseManager"
+			);
+			throw new FriendlyError(
+				oneLine`The bot wasn't configured correctly!
+				Contact one of the developers about this issue.`
+			);
+		}
+
 		const parse = await CustomCommand.customParseCommand(
 			this.client.database,
 			newCommandId,
@@ -68,10 +85,7 @@ export default class extends BaseSubcommand {
 		// If the user didn't enter the command right, show help
 		if (!parse) {
 			if (msg && !silent) {
-				await PluginManager.sendHelpForCommand(
-					msg,
-					await msg.getPlace()
-				);
+				await msg.sendHelpForCommand();
 			}
 			return;
 		}

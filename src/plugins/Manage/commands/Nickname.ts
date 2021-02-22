@@ -1,4 +1,4 @@
-import { Message, BasePlugin, BaseCommand, Logger } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin, Logger } from "@framedjs/core";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -7,7 +7,7 @@ export default class extends BaseCommand {
 			aliases: ["nick"],
 			about: "Sets the nickname of the bot.",
 			usage: "<nickname>",
-			permissions: {
+			userPermissions: {
 				discord: {
 					permissions: ["MANAGE_GUILD"],
 				},
@@ -15,13 +15,7 @@ export default class extends BaseCommand {
 		});
 	}
 
-	async run(msg: Message): Promise<boolean> {
-		// Checks for permission
-		if (!this.hasPermission(msg, this.permissions)) {
-			this.sendPermissionErrorMessage(msg);
-			return false;
-		}
-
+	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			// Things
 			const newNickname = msg.getArgsContent();

@@ -3,6 +3,9 @@ settings.json
 refresh_token.json
 
 # Database Files
+ormconfig.js
+ormconfig.ts
+ormconfig.json
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
