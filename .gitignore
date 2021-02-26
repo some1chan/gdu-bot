@@ -1,6 +1,7 @@
 # Sensitive files
 settings.json
 refresh_token.json
+debug.env
 
 # Database Files
 ormconfig.js
