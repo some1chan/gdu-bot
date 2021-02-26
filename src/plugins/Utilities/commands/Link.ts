@@ -14,7 +14,7 @@ export default class Link extends BaseCommand {
 		super(plugin, {
 			id: "link",
 			prefixes: ["d."],
-			aliases: ["discohook", "discohookembed", "embed", "lnk"],
+			aliases: ["discohook", "discohookembed", "embed", "lnk", "restore"],
 			about: "Recreates a Discord message into Discohook.",
 			usage: "[id|link|content]",
 		});
