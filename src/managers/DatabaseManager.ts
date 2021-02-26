@@ -64,6 +64,8 @@ export class DatabaseManager extends Base {
 			}
 		}
 		await this.install();
+
+		Logger.info("Initalized database manager");
 	}
 
 	//#region Install
@@ -92,13 +94,10 @@ export class DatabaseManager extends Base {
 	 */
 	async installDefaults(): Promise<void> {
 		Logger.info(`Detected first-time run, installing defaults...`);
-		const placeId = this.client.provider.place.generateId();
+		const placeId = this.client.provider.places.generateId();
 
 		const settled1 = await Promise.allSettled([
 			this.addGroup("Other", "❔", "default", true),
-			// this.client.provider.place.set("default", placeId, "discord"),
-			// this.client.provider.place.set("default", placeId, "twitch"),
-			// this.client.provider.place.set("default", placeId, "none"),
 		]);
 
 		for (const settle of settled1) {
@@ -111,35 +110,6 @@ export class DatabaseManager extends Base {
 					break;
 			}
 		}
-
-		// const settled2 = await Promise.allSettled([
-		// 	this.client.provider.prefixes.set(
-		// 		"default",
-		// 		placeId,
-		// 		this.client.defaultPrefix
-		// 	),
-		// 	this.client.provider.prefixes.set(
-		// 		"default",
-		// 		placeId,
-		// 		this.client.discord.defaultPrefix
-		// 	),
-		// 	this.client.provider.prefixes.set(
-		// 		"default",
-		// 		placeId,
-		// 		this.client.twitch.defaultPrefix
-		// 	),
-		// ]);
-
-		// for (const settle of settled2) {
-		// 	switch (settle.status) {
-		// 		case "rejected":
-		// 			Logger.error(settle.reason);
-		// 			break;
-
-		// 		default:
-		// 			break;
-		// 	}
-		// }
 	}
 
 	/**

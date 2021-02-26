@@ -47,10 +47,7 @@ export class TypeORMSettingsProvider extends SettingsProvider {
 		value: unknown
 	): Promise<Map<string, Settings>> {
 		// Gets existing settings and sets our value
-		let settings = this.cache.get(placeId);
-		if (!settings) {
-			settings = {};
-		}
+		let settings = this.cache.get(placeId) ?? {};
 		settings[key] = value;
 
 		// Saves it to the database

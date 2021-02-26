@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Settings as SettingsInterface } from "@framedjs/core";
 
 @Entity()
 export default class Settings {
@@ -6,7 +7,5 @@ export default class Settings {
 	placeId!: string;
 
 	@Column("simple-json")
-	settings!: {
-		[key: string]: unknown;
-	};
+	settings!: SettingsInterface;
 }

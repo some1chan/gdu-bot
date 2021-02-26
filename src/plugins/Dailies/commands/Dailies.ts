@@ -1,5 +1,10 @@
 /* eslint-disable no-irregular-whitespace */
-import { BaseCommand, BasePlugin, EmbedHelper, BaseMessage } from "@framedjs/core";
+import {
+	BaseCommand,
+	BaseMessage,
+	BasePlugin,
+	EmbedHelper,
+} from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 
 export default class extends BaseCommand {
@@ -42,7 +47,6 @@ export default class extends BaseCommand {
 							)
 							.addField(
 								"Checking Streaks",
-
 								stripIndent`
 								${bulletPoint}Use \`!streaks\` to check your own streaks!
 								${bulletPoint}If you want to check someone else's, try \`!streaks @User\`. 

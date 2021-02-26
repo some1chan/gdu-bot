@@ -99,7 +99,6 @@ export default class Raw extends BaseCommand {
 					linkMsg = await DiscordUtils.getMessageFromLink(
 						content,
 						msg.discord.client,
-						msg.discord.author,
 						msg.discord.guild
 					);
 				} catch (error) {

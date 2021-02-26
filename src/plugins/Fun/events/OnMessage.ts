@@ -20,7 +20,7 @@ export default class extends BaseEvent {
 		// but events will also try to create a new place too,
 		// thus creating duplicates and will error
 		const platformId = msg.guild?.id ?? "discord_default";
-		const place = this.client.provider.place.get(platformId);
+		const place = this.client.provider.places.get(platformId);
 		if (!place) {
 			return;
 		}

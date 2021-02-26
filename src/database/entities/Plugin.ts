@@ -1,3 +1,4 @@
+import { Settings } from "@framedjs/core";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
@@ -6,5 +7,5 @@ export default class Plugin {
 	id!: string;
 
 	@Column({ type: "simple-json" })
-	data!: Record<string, unknown>;
+	data!: Settings;
 }

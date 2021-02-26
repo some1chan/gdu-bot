@@ -4,10 +4,10 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "eval",
-			about: "everything goes wrong",
+			about: "Everything goes wrong.",
 			usage: "<code>",
 			userPermissions: {
-				discord: {},
+				botOwnersOnly: true,
 			},
 		});
 	}

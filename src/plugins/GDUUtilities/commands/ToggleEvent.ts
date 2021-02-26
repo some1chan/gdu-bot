@@ -13,7 +13,11 @@ export default class extends BaseCommand {
 			id: "toggleevent",
 			about: "Sets up the server for a community event.",
 			description: stripIndents`${oneLine`Sets up the server for a community event.
-			This command will move the Events channel up, and show the "We're Recording" channel.`}`,
+			This command will move the Events channel up. Optionally, it can also show the
+			"We're Recording" channel.`}`,
+			examples: stripIndents`
+			\`{{prefix}}{{id}}\`
+			\`{{prefix}}{{id}} record\``,
 			userPermissions: {
 				discord: {
 					// Mods, Community Manager
@@ -131,10 +135,12 @@ export default class extends BaseCommand {
 
 			// Gets the "We're Recording" channel, but won't error out if it doesn't exist
 			let recordingChannel: Discord.GuildChannel | undefined;
-			if (process.env.RECORDING_CHANNEL_ID) {
-				recordingChannel = mainGuild.channels.cache.get(
-					process.env.RECORDING_CHANNEL_ID
-				);
+			if (process.env.RECORDING_CHANNEL_ID && msg.args) {
+				if (msg.args[0] == "record") {
+					recordingChannel = mainGuild.channels.cache.get(
+						process.env.RECORDING_CHANNEL_ID
+					);
+				}
 			}
 
 			const sorted = this.sortChannelCategories(mainGuild);

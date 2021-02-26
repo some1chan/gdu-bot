@@ -15,7 +15,8 @@ export default class extends BaseCommand {
 			usage: "<image URL>",
 			userPermissions: {
 				discord: {
-					roles: ["758771336289583125", "462342299171684364"],
+					// Mods, Community Manager
+					roles: ["462342299171684364", "758771336289583125"],
 				},
 			},
 		});

@@ -1,7 +1,5 @@
 import { BasePlugin, Client, FriendlyError, Logger } from "@framedjs/core";
-import { oneLine } from "common-tags";
 import path from "path";
-import { CustomClient } from "../../structures/CustomClient";
 
 export default class extends BasePlugin {
 	constructor(client: Client) {
@@ -29,26 +27,6 @@ export default class extends BasePlugin {
 	}
 
 	async install(): Promise<void> {
-		if (!(this.client instanceof CustomClient)) {
-			Logger.error(
-				"CustomClient is needed! This code needs a reference to DatabaseManager"
-			);
-			throw new FriendlyError(
-				oneLine`The bot wasn't configured correctly!
-				Contact one of the developers about this issue.`
-			);
-		}
-
-		const dbPlugin = await this.client.database.findPlugin(this.id);
-		if (!dbPlugin) {
-			throw new Error("Couldn't find plugin in database!");
-		}
-		const pluginRepo = this.client.database.pluginRepo;
-		if (!pluginRepo) {
-			throw new Error("Couldn't find plugin repo in database!");
-		}
-
-		dbPlugin.data.version = "1.52";
-		await pluginRepo.save(dbPlugin);
+		await this.client.provider.plugins.set(this.id, "version", "1.63.4");
 	}
 }

@@ -4,9 +4,11 @@ import { TypeORMPlaceProvider } from "./TypeORMPlaceProvider";
 import { TypeORMPrefixProvider } from "./TypeORMPrefixProvider";
 import { TypeORMSettingsProvider } from "./TypeORMSettingsProvider";
 import Place from "../database/entities/Place";
+import Plugin from "../database/entities/Plugin";
 import Prefix from "../database/entities/Prefix";
 import Settings from "../database/entities/Settings";
 import { DatabaseManager } from "../managers/DatabaseManager";
+import { TypeORMPluginProvider } from "./TypeORMPluginProvider";
 
 export class TypeORMProvider extends BaseProvider {
 	connectionName?: string;
@@ -22,9 +24,15 @@ export class TypeORMProvider extends BaseProvider {
 			throw new ReferenceError(DatabaseManager.errorNotFound);
 		}
 
-		this.place = new TypeORMPlaceProvider(
+		// Overrides defaults
+		this.places = new TypeORMPlaceProvider(
 			this,
 			connection.getRepository(Place)
+		);
+
+		this.plugins = new TypeORMPluginProvider(
+			this,
+			connection.getRepository(Plugin)
 		);
 
 		this.prefixes = new TypeORMPrefixProvider(
@@ -37,7 +45,7 @@ export class TypeORMProvider extends BaseProvider {
 			connection.getRepository(Settings)
 		);
 
-		await this.place.init();
-		await Promise.all([this.prefixes.init(), this.settings.init()]);
+		// Runs the init for all the subproviders
+		await super.init(true);
 	}
 }

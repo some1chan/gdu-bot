@@ -16,12 +16,16 @@ const data: HelpData[][] = [
 			commands: ["bumpstreak", "setmercies", "setstreak"],
 		},
 		{
-			group: "Voice Queue",
-			commands: ["queue"],
-		},
-		{
 			group: "GDU Utilities",
 			commands: ["toggleevent"],
+		},
+		{
+			group: "Reaction Roles",
+			commands: ["reactionrole"],
+		},
+		{
+			group: "Voice Queue",
+			commands: ["queue"],
 		},
 	],
 	[

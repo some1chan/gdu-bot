@@ -28,7 +28,7 @@ export default class extends BaseRouter {
 				// but events will also try to create a new place too,
 				// thus creating duplicates and will error
 				const platformId = guild?.id ?? "discord_default";
-				let place = this.client.provider.place.get(platformId);
+				let place = this.client.provider.places.get(platformId);
 				if (!place) {
 					place = {
 						id: "default",

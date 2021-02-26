@@ -3,6 +3,7 @@ console.log("Starting bot... this might take a while.");
 // https://www.stefanjudis.com/today-i-learned/measuring-execution-time-more-precisely-in-the-browser-and-node-js/
 const startTime = process.hrtime();
 
+import "reflect-metadata";
 import { Logger, LoginOptions, Utils, version } from "@framedjs/core";
 import { CustomClient } from "./structures/CustomClient";
 import { TypeORMLogger } from "./logger/TypeORMLogger";
@@ -35,7 +36,7 @@ const DbLogger = Winston.createLogger({
 });
 
 // Gets the version of the app
-let appVersion: string | undefined;
+let appVersion: string;
 try {
 	const packageFile = fs.readFileSync(
 		path.resolve(__dirname, "../package.json"),
@@ -45,6 +46,8 @@ try {
 	appVersion = packageJson.version;
 } catch (error) {
 	Logger.error(error.stack);
+	Logger.warn("Using 0.0.0 as the app version by default.");
+	appVersion = "0.0.0";
 }
 
 Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded imports.`);
@@ -122,7 +125,7 @@ async function start() {
 		],
 		appVersion: appVersion,
 		discord: {
-			owners: ["200340393596944384"],
+			botOwners: "200340393596944384",
 		},
 	});
 
@@ -134,9 +137,9 @@ async function start() {
 	});
 	Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded custom plugins.`);
 
-	// Initializes DatabaseManager, and providers
-	await client.database.init();
+	// Initializes providers, and providers
 	await client.provider.init();
+	await client.database.init();
 
 	//#region Creates login data
 	const loginData: LoginOptions[] = [
