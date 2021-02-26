@@ -1,6 +1,6 @@
 {
   "name": "gdu-bot",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "scripts": {
     "typeorm": "node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./ormconfig.js",
     "build": "tsc --build",
@@ -20,7 +20,7 @@
     "url": "https://github.com/some1chan/gdu-bot/issues"
   },
   "dependencies": {
-    "@framedjs/core": "^0.3.0-next.6",
+    "@framedjs/core": "^0.3.0",
     "axios": "^0.21.1",
     "colors": "^1.4.0",
     "common-tags": "^1.8.0",
