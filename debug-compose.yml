@@ -3,7 +3,7 @@ services:
   gdu-bot-debug:
     build: ./
     volumes:
-      - ./data/:/app/data/
+      - ./debug-data/:/app/data/
     env_file: debug.env
     ports:
       - ${API_PORT}:${API_PORT}
