@@ -94,7 +94,6 @@ export class DatabaseManager extends Base {
 	 */
 	async installDefaults(): Promise<void> {
 		Logger.info(`Detected first-time run, installing defaults...`);
-		const placeId = this.client.provider.places.generateId();
 
 		const settled1 = await Promise.allSettled([
 			this.addGroup("Other", "❔", "default", true),
@@ -104,9 +103,6 @@ export class DatabaseManager extends Base {
 			switch (settle.status) {
 				case "rejected":
 					Logger.error(settle.reason);
-					break;
-
-				default:
 					break;
 			}
 		}
