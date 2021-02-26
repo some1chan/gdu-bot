@@ -245,17 +245,21 @@ export default class VoiceQueue extends BasePlugin {
 	}
 
 	async loadedProviders(): Promise<void> {
-		const data = this.client.provider.plugins.getAll(this.id) as
-			| {
-					queue: string;
-			  }
-			| undefined;
-		if (data) {
-			this.queue = new Map(JSON.parse(data.queue, this.reviver));
-			Logger.debug(`Loaded queue data from database.`);
-			Logger.debug(data.queue);
-		} else {
-			Logger.debug(`No queue data found.`);
+		try {
+			const data = this.client.provider.plugins.getAll(this.id) as Record<
+				string,
+				string
+			>;
+
+			if (data["queue"]) {
+				this.queue = new Map(JSON.parse(data["queue"], this.reviver));
+				Logger.debug(`Loaded queue data from database.`);
+				Logger.debug(data.queue);
+			} else {
+				Logger.debug(`No queue data found.`);
+			}
+		} catch (error) {
+			Logger.error(error.stack);
 		}
 	}
 

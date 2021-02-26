@@ -63,36 +63,36 @@ export default class extends BasePlugin {
 
 			if (!url) return;
 
-			const msg = await DiscordUtils.getMessageFromLink(
-				url,
-				discordClient,
-				guild
-			);
+			try {
+				const msg = await DiscordUtils.getMessageFromLink(
+					url,
+					discordClient,
+					guild
+				);
 
-			if (msg) {
-				try {
+				if (msg) {
 					msg.fetch();
-				} catch (error) {
-					Logger.error(error);
-				}
 
-				await Promise.all([
-					!msg.reactions.cache.has(process.env.YOUTUBE_EMOJI)
-						? msg.react(process.env.YOUTUBE_EMOJI)
-						: undefined,
-					!msg.reactions.cache.has(process.env.TWITCH_EMOJI)
-						? msg.react(process.env.TWITCH_EMOJI)
-						: undefined,
-					!msg.reactions.cache.has(process.env.EVENT_EMOJI)
-						? msg.react(process.env.EVENT_EMOJI)
-						: undefined,
-					!msg.reactions.cache.has(process.env.GAME_EMOJI)
-						? msg.react(process.env.GAME_EMOJI)
-						: undefined,
-					!msg.reactions.cache.has(process.env.STREAK_EMOJI)
-						? msg.react(process.env.STREAK_EMOJI)
-						: undefined,
-				]);
+					await Promise.all([
+						!msg.reactions.cache.has(process.env.YOUTUBE_EMOJI)
+							? msg.react(process.env.YOUTUBE_EMOJI)
+							: undefined,
+						!msg.reactions.cache.has(process.env.TWITCH_EMOJI)
+							? msg.react(process.env.TWITCH_EMOJI)
+							: undefined,
+						!msg.reactions.cache.has(process.env.EVENT_EMOJI)
+							? msg.react(process.env.EVENT_EMOJI)
+							: undefined,
+						!msg.reactions.cache.has(process.env.GAME_EMOJI)
+							? msg.react(process.env.GAME_EMOJI)
+							: undefined,
+						!msg.reactions.cache.has(process.env.STREAK_EMOJI)
+							? msg.react(process.env.STREAK_EMOJI)
+							: undefined,
+					]);
+				}
+			} catch (error) {
+				Logger.error(error.stack);
 			}
 		}
 	}
