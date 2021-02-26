@@ -1,5 +1,5 @@
 dependencies:
-  '@framedjs/core': 0.3.0_ed599a015915b1224963170c6c62b663
+  '@framedjs/core': 0.3.0_32c6c4e5be51d765d60bcccbaa6d38fe
   axios: 0.21.1
   colors: 1.4.0
   common-tags: 1.8.0
@@ -8,12 +8,12 @@ dependencies:
   hastebin: 0.2.1
   luxon: 1.26.0
   node-emoji: 1.10.0
-  node-schedule: 1.3.3
+  node-schedule: 2.0.0
   reflect-metadata: 0.1.13
   sqlite3: 5.0.2
-  twitch: 4.4.11
-  twitch-auth: 4.4.11
-  twitch-chat-client: 4.4.11_84f61214ad74017cc2e4ffbf0471ea1e
+  twitch: 4.4.12
+  twitch-auth: 4.4.12
+  twitch-chat-client: 4.4.12_186ccc4f3b6eb29d4c607c64f9b70e23
   typeorm: 0.2.31
   winston: 3.3.3
 devDependencies:
@@ -22,8 +22,8 @@ devDependencies:
   '@types/node': 14.14.31
   '@types/node-emoji': 1.8.1
   '@types/node-schedule': 1.3.1
-  ts-node-dev: 1.1.1_typescript@4.1.5
-  typescript: 4.1.5
+  ts-node-dev: 1.1.6_typescript@4.2.2
+  typescript: 4.2.2
 lockfileVersion: 5.2
 optionalDependencies:
   bufferutil: 4.0.3
@@ -148,7 +148,7 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha512-ZfFsbgEXW71Rw/6EtBdrP5VxBJy4dthyC0tpQKGKmYFImlmmrykO14Za+BiIVduwjte0jXEBlhSKf0MWbFp9Eg==
-  /@framedjs/core/0.3.0_ed599a015915b1224963170c6c62b663:
+  /@framedjs/core/0.3.0_32c6c4e5be51d765d60bcccbaa6d38fe:
     dependencies:
       '@framedjs/logger': 0.1.0
       '@framedjs/shared': 0.1.0
@@ -161,9 +161,9 @@ packages:
       node-emoji: 1.10.0
       reflect-metadata: 0.1.13
       require-all: 3.0.0
-      twitch: 4.4.11
-      twitch-auth: 4.4.11
-      twitch-chat-client: 4.4.11_84f61214ad74017cc2e4ffbf0471ea1e
+      twitch: 4.4.12
+      twitch-auth: 4.4.12
+      twitch-chat-client: 4.4.12_186ccc4f3b6eb29d4c607c64f9b70e23
     dev: false
     engines:
       node: '>=14.0.0'
@@ -557,7 +557,7 @@ packages:
       integrity: sha512-CcPFD3JwdQ2oSzy+AMG6j3LRTkNjM82kzcSKzoVw6cLanDCJNlsLjeqVTOTfOfucnWv5F0rmBemVf1m9JiIasw==
   /cliui/7.0.4:
     dependencies:
-      string-width: 4.2.0
+      string-width: 4.2.1
       strip-ansi: 6.0.0
       wrap-ansi: 7.0.0
     dev: false
@@ -685,15 +685,15 @@ packages:
     dev: true
     resolution:
       integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
-  /cron-parser/2.18.0:
+  /cron-parser/3.2.0:
     dependencies:
       is-nan: 1.3.2
-      moment-timezone: 0.5.33
+      luxon: 1.26.0
     dev: false
     engines:
       node: '>=0.8'
     resolution:
-      integrity: sha512-s4odpheTyydAbTBQepsqd2rNWGa2iV3cyo8g7zbI2QQYGLVsfbhmwukayS1XHppe02Oy1fg7mg6xoaraVJeEcg==
+      integrity: sha512-PBI6almCTmOLikQzxcbZovK5d6zm7hWzmp6fKRN7lqZ2IRfinUCKzxRsuGrFU9fEGU0bz2ZU/OpKWlzWMxAwWQ==
   /currently-unhandled/0.4.1:
     dependencies:
       array-find-index: 1.0.2
@@ -895,8 +895,8 @@ packages:
       object-inspect: 1.9.0
       object-keys: 1.1.1
       object.assign: 4.1.2
-      string.prototype.trimend: 1.0.3
-      string.prototype.trimstart: 1.0.3
+      string.prototype.trimend: 1.0.4
+      string.prototype.trimstart: 1.0.4
     dev: false
     engines:
       node: '>= 0.4'
@@ -1826,16 +1826,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
-  /moment-timezone/0.5.33:
-    dependencies:
-      moment: 2.29.1
-    dev: false
-    resolution:
-      integrity: sha512-PTc2vcT8K9J5/9rDEPe5czSIKgLoGsH8UNpA4qZTVw0Vd/Uz19geE9abbIOQKaAQFcnQ3v5YEXrbSc5BpshH+w==
-  /moment/2.29.1:
-    dev: false
-    resolution:
-      integrity: sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
   /ms/2.0.0:
     dev: false
     resolution:
@@ -1945,14 +1935,16 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-TwWAOZb0j7e9eGaf9esRx3ZcLaE5tQ2lvYy1pb5IAaG1a2e2Kv5Lms1Y4hpj+ciXJRofIxxlt5haeQ/2ANeE0Q==
-  /node-schedule/1.3.3:
+  /node-schedule/2.0.0:
     dependencies:
-      cron-parser: 2.18.0
+      cron-parser: 3.2.0
       long-timeout: 0.1.1
       sorted-array-functions: 1.3.0
     dev: false
+    engines:
+      node: '>=6'
     resolution:
-      integrity: sha512-uF9Ubn6luOPrcAYKfsXWimcJ1tPFtQ8I85wb4T3NgJQrXazEzojcFZVk46ZlLHby3eEJChgkV/0T689IsXh2Gw==
+      integrity: sha512-cHc9KEcfiuXxYDU+HjsBVo2FkWL1jRAUoczFoMIzRBpOA4p/NRHuuLs85AWOLgKsHtSPjN8csvwIxc2SqMv+CQ==
   /node-status-codes/1.0.0:
     dev: false
     engines:
@@ -2539,7 +2531,7 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-EYvfW4zcUaKn5w0hHgfisLmxB9M=
-  /string-width/4.2.0:
+  /string-width/4.2.1:
     dependencies:
       emoji-regex: 8.0.0
       is-fullwidth-code-point: 3.0.0
@@ -2548,14 +2540,7 @@ packages:
     engines:
       node: '>=8'
     resolution:
-      integrity: sha512-zUz5JD+tgqtuDjMhwIg5uFVV3dtqZ9yQJlZVfq4I01/K5Paj5UHj7VyrQOJvzawSVlKpObApbfD0Ed6yJc+1eg==
-  /string.prototype.trimend/1.0.3:
-    dependencies:
-      call-bind: 1.0.2
-      define-properties: 1.1.3
-    dev: false
-    resolution:
-      integrity: sha512-ayH0pB+uf0U28CtjlLvL7NaohvR1amUvVZk+y3DYb0Ey2PUV5zPkkKy9+U1ndVEIXO8hNg18eIv9Jntbii+dKw==
+      integrity: sha512-LL0OLyN6AnfV9xqGQpDBwedT2Rt63737LxvsRxbcwpa2aIeynBApG2Sm//F3TaLHIR1aJBN52DWklc06b94o5Q==
   /string.prototype.trimend/1.0.4:
     dependencies:
       call-bind: 1.0.2
@@ -2563,13 +2548,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-y9xCjw1P23Awk8EvTpcyL2NIr1j7wJ39f+k6lvRnSMz+mz9CGz9NYPelDk42kOz6+ql8xjfK8oYzy3jAP5QU5A==
-  /string.prototype.trimstart/1.0.3:
-    dependencies:
-      call-bind: 1.0.2
-      define-properties: 1.1.3
-    dev: false
-    resolution:
-      integrity: sha512-oBIBUy5lea5tt0ovtOFiEQaBkoBBkyJhZXzJYrSmDo5IUUqbOPvVezuRs/agBIdZ2p2Eo1FD6bD9USyBLfl3xg==
   /string.prototype.trimstart/1.0.4:
     dependencies:
       call-bind: 1.0.2
@@ -2737,7 +2715,7 @@ packages:
     dev: false
     resolution:
       integrity: sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
-  /ts-node-dev/1.1.1_typescript@4.1.5:
+  /ts-node-dev/1.1.6_typescript@4.2.2:
     dependencies:
       chokidar: 3.5.1
       dateformat: 1.0.12
@@ -2748,9 +2726,9 @@ packages:
       rimraf: 2.7.1
       source-map-support: 0.5.19
       tree-kill: 1.2.2
-      ts-node: 9.1.1_typescript@4.1.5
+      ts-node: 9.1.1_typescript@4.2.2
       tsconfig: 7.0.0
-      typescript: 4.1.5
+      typescript: 4.2.2
     dev: true
     engines:
       node: '>=0.8.0'
@@ -2762,15 +2740,15 @@ packages:
       node-notifier:
         optional: true
     resolution:
-      integrity: sha512-kAO8LUZgXZSY0+PucMPsQ0Bbdv0x+lgbN7j8gcD4PuTI4uKC6YchekaspmYTBNilkiu+rQYkWJA7cK+Q8/B0tQ==
-  /ts-node/9.1.1_typescript@4.1.5:
+      integrity: sha512-RTUi7mHMNQospArGz07KiraQcdgUVNXKsgO2HAi7FoiyPMdTDqdniB6K1dqyaIxT7c9v/VpSbfBZPS6uVpaFLQ==
+  /ts-node/9.1.1_typescript@4.2.2:
     dependencies:
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
       source-map-support: 0.5.19
-      typescript: 4.1.5
+      typescript: 4.2.2
       yn: 3.1.1
     dev: true
     engines:
@@ -2819,29 +2797,29 @@ packages:
     dev: false
     resolution:
       integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
-  /twitch-api-call/4.4.11:
+  /twitch-api-call/4.4.12:
     dependencies:
       '@d-fischer/cross-fetch': 4.0.2
       '@d-fischer/qs': 7.0.2
       '@types/node-fetch': 2.5.8
       node-fetch: 2.6.1
       tslib: 2.1.0
-      twitch-common: 4.4.11
+      twitch-common: 4.4.12
     dev: false
     resolution:
-      integrity: sha512-wy9BCaxYq7HfStMEO6DOWeNxTkpm52UfZfYTUzFqVHpOfQbtdynJaW+bCkcwiK7Ka3TvxxviTwojAEXrapkpPQ==
-  /twitch-auth/4.4.11:
+      integrity: sha512-AFGj3Jo1T3dF3MApQtFgIXLXix3tipWN5ytOHpOaO1zMjmRaQ+wIAnS1znzIPJPmpY8R+lBjnasFOq1mwfrtKg==
+  /twitch-auth/4.4.12:
     dependencies:
       '@d-fischer/deprecate': 2.0.2
       '@d-fischer/logger': 3.1.0
       '@d-fischer/shared-utils': 3.0.1
       tslib: 2.1.0
-      twitch-api-call: 4.4.11
-      twitch-common: 4.4.11
+      twitch-api-call: 4.4.12
+      twitch-common: 4.4.12
     dev: false
     resolution:
-      integrity: sha512-4xbZm/fJtliZ3uX/8pPV9DZ8vtAoFxqp8ftGPPnHZF3KkqCEXWt9y9cMvCzAzljO3jjOkN7vAZCqtbNrf3hhAw==
-  /twitch-chat-client/4.4.11_84f61214ad74017cc2e4ffbf0471ea1e:
+      integrity: sha512-MxmwpKFg5UPo7IcrqCAXS90GxOUedN2FKhpzn70qauBZGOQpSPEmfts6Da0MVbqHJHiKNxClSwRDb6MjPtENCw==
+  /twitch-chat-client/4.4.12_186ccc4f3b6eb29d4c607c64f9b70e23:
     dependencies:
       '@d-fischer/cache-decorators': 2.1.3
       '@d-fischer/deprecate': 2.0.2
@@ -2851,25 +2829,25 @@ packages:
       '@d-fischer/typed-event-emitter': 3.2.2
       ircv3: 0.26.12_c70f8fc5586dd378b8c866035dbe710b
       tslib: 2.1.0
-      twitch: 4.4.11
-      twitch-auth: 4.4.11
-      twitch-common: 4.4.11
+      twitch: 4.4.12
+      twitch-auth: 4.4.12
+      twitch-common: 4.4.12
     dev: false
     peerDependencies:
       bufferutil: '*'
       twitch: ^4.4.0
       utf-8-validate: '*'
     resolution:
-      integrity: sha512-CHsRbVnEKqDEnFNq87242Eig5uyuUwQLenWkjh7V/3YsyP3zwmDCfHkJVr8zLxT6dzuSAArr7DqU79icPDRi/A==
-  /twitch-common/4.4.11:
+      integrity: sha512-czbtBl5TVPGNOU1mMmWBxxBWHjH9ieiejya1mkb4LP4e1UJ4W6zcAN9kTtqR9XaFxt8yP9z32SnHj2g3yTdYuQ==
+  /twitch-common/4.4.12:
     dependencies:
       '@d-fischer/logger': 3.1.0
       '@d-fischer/shared-utils': 3.0.1
       tslib: 2.1.0
     dev: false
     resolution:
-      integrity: sha512-g3xcwMCNy2IWlDvYRF6Zi33FM0rk7lNNNQDw62CbJxLJiC+lIN4AURBiiuLnn569x0pyk6y6g60Il6mxIIsTqg==
-  /twitch/4.4.11:
+      integrity: sha512-hYDHD4TbDrg5YDc8/fSk64ohdtrrF3YRwL52mo+UYvlHuhmUyM2ww9ea3vdtaZg41MHyL6dOLtU1UrftoZGq2g==
+  /twitch/4.4.12:
     dependencies:
       '@d-fischer/cache-decorators': 2.1.3
       '@d-fischer/deprecate': 2.0.2
@@ -2878,13 +2856,13 @@ packages:
       '@d-fischer/shared-utils': 3.0.1
       top-package: 1.0.1
       tslib: 2.1.0
-      twitch-api-call: 4.4.11
-      twitch-auth: 4.4.11
-      twitch-common: 4.4.11
+      twitch-api-call: 4.4.12
+      twitch-auth: 4.4.12
+      twitch-common: 4.4.12
     dev: false
     requiresBuild: true
     resolution:
-      integrity: sha512-v6UBSK3o56k8mF1ySn+mq7zGdIYgI0cbAdb/n5v+uG1JFbktFqG1plD7JWL4nUbEAWbn+tltOMO5omLDoDuHLw==
+      integrity: sha512-3Rsc5cO44agrDOb2butbvkL+FlISAhQBwkNijDBaje8XRBgLndUzDce/PjNYedu0slkoNn1HlDGmgEyy0NHs9Q==
   /type-is/1.6.18:
     dependencies:
       media-typer: 0.3.0
@@ -2916,13 +2894,13 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-dVvCEVHH48DG0QPXAKfo0l6ecQrl3A8ucGP4Yw4myz4YEDMProebTQo8as83uyES+nrwCbu3qdkL4ncC2+qcMA==
-  /typescript/4.1.5:
+  /typescript/4.2.2:
     dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true
     resolution:
-      integrity: sha512-6OSu9PTIzmn9TCDiovULTnET6BgXtDYL4Gg4szY+cGsc3JP1dQL8qvE8kShTRx1NIw4Q9IBHlwODjkjWEtMUyA==
+      integrity: sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
   /unzip-response/1.0.2:
     dev: false
     engines:
@@ -3028,7 +3006,7 @@ packages:
   /wrap-ansi/7.0.0:
     dependencies:
       ansi-styles: 4.3.0
-      string-width: 4.2.0
+      string-width: 4.2.1
       strip-ansi: 6.0.0
     dev: false
     engines:
@@ -3110,7 +3088,7 @@ packages:
       escalade: 3.1.1
       get-caller-file: 2.0.5
       require-directory: 2.1.1
-      string-width: 4.2.0
+      string-width: 4.2.1
       y18n: 5.0.5
       yargs-parser: 20.2.6
     dev: false
@@ -3166,15 +3144,15 @@ specifiers:
   hastebin: ^0.2.1
   luxon: ^1.26.0
   node-emoji: ^1.10.0
-  node-schedule: ^1.3.3
+  node-schedule: ^2.0.0
   reflect-metadata: ^0.1.13
   sqlite3: ^5.0.2
-  ts-node-dev: ^1.1.1
-  twitch: ^4.4.11
-  twitch-auth: ^4.4.11
-  twitch-chat-client: ^4.4.11
+  ts-node-dev: ^1.1.6
+  twitch: ^4.4.12
+  twitch-auth: ^4.4.12
+  twitch-chat-client: ^4.4.12
   typeorm: ^0.2.31
-  typescript: ^4.1.5
+  typescript: ^4.2.2
   utf-8-validate: ^5.0.4
   winston: ^3.3.3
   zlib-sync: ^0.1.7
