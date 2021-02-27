@@ -11,6 +11,7 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "toggleevent",
+			aliases: ["toggleevents"],
 			about: "Sets up the server for a community event.",
 			description: stripIndents`${oneLine`Sets up the server for a community event.
 			This command will move the Events channel up. Optionally, it can also show the
