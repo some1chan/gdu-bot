@@ -71,7 +71,7 @@ export default class extends BasePlugin {
 				);
 
 				if (msg) {
-					msg.fetch();
+					await msg.fetch();
 
 					await Promise.all([
 						!msg.reactions.cache.has(process.env.YOUTUBE_EMOJI)
