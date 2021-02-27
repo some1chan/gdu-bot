@@ -121,10 +121,15 @@ export default class extends BaseCommand {
 							suggestionEmbed.footer?.iconURL
 						);
 
+					let discordMessage: Discord.Message;
 					if (msgWithEmbed) {
-						await msgWithEmbed.edit(suggestionEmbed);
+						discordMessage = await msgWithEmbed.edit(
+							suggestionEmbed
+						);
 					} else {
-						await suggestionChannel.send(suggestionEmbed);
+						discordMessage = await suggestionChannel.send(
+							suggestionEmbed
+						);
 					}
 
 					const thanks = stripIndents`
@@ -145,7 +150,20 @@ export default class extends BaseCommand {
 					);
 
 					try {
-						await msg.discord.msg?.react("👍");
+						await Promise.all([
+							msg.discord.msg?.react("👍"),
+							discordMessage.fetch(),
+						]);
+
+						const listOfReactions = ["👍", "👎", "🤷"];
+						const queue: Promise<Discord.MessageReaction>[] = [];
+						for (const emoji of listOfReactions) {
+							if (!discordMessage.reactions.cache.has(emoji)) {
+								queue.push(discordMessage.react(emoji));
+							}
+						}
+
+						await Promise.all(queue);
 					} catch (error) {
 						Logger.error(error);
 					}
