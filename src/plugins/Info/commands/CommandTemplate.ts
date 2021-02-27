@@ -3,7 +3,7 @@ import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
-			id: "template",
+			id: "commandtemplate",
 			about: "Not a real command. Instead, you should copy me!",
 			usage: "<required param> [optional param]",
 		});
