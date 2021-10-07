@@ -27,10 +27,8 @@ export default class Raw extends BaseCommand {
 			\`{{prefix}}{{id}}\`
 			\`{{prefix}}{{id}} This ~~is~~ a **test**!\``,
 			userPermissions: {
-				discord: {
-					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
-				},
+				botOwnersOnly: true,
+				checkAutomatically: false,
 			},
 			inline: true,
 			// hideUsageInHelp: true,
@@ -38,8 +36,15 @@ export default class Raw extends BaseCommand {
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
 			return false;
 		}
 
@@ -65,9 +70,9 @@ export default class Raw extends BaseCommand {
 		silent?: boolean
 	): Promise<
 		| {
-			newMsg?: Discord.Message;
-			newContent: string;
-		}
+				newMsg?: Discord.Message;
+				newContent: string;
+		  }
 		| undefined
 	> {
 		if (msg.discord?.guild && msg.args) {
@@ -81,7 +86,7 @@ export default class Raw extends BaseCommand {
 			const snowflake = Discord.SnowflakeUtil.deconstruct(content.trim());
 			const validSnowflake =
 				snowflake.binary !=
-				"0000000000000000000000000000000000000000000000000000000000000000" &&
+					"0000000000000000000000000000000000000000000000000000000000000000" &&
 				/^\d+$/.test(content);
 			if (validSnowflake) {
 				snowflakeMsg = await Raw.getMessageFromSnowflake(
@@ -103,7 +108,7 @@ export default class Raw extends BaseCommand {
 					);
 				} catch (error) {
 					if (linkError instanceof FriendlyError) {
-						linkError = error;
+						linkError = error as FriendlyError;
 					} else {
 						throw error;
 					}
@@ -124,7 +129,7 @@ export default class Raw extends BaseCommand {
 					});
 				} catch (error) {
 					Logger.error(
-						`Unable to fetch messages in channel\n${error.stack}`
+						`Unable to fetch messages in channel\n${(error as Error).stack}`
 					);
 				}
 			}
@@ -229,7 +234,9 @@ export default class Raw extends BaseCommand {
 											await msg.getPlace()
 										)
 									);
-									await msg.discord.channel.send(embed);
+									await msg.discord.channel.send({
+										embeds: [embed],
+									});
 									await msg.discord.channel.send(
 										newCleanContent
 									);
@@ -243,7 +250,7 @@ export default class Raw extends BaseCommand {
 							${codeblock}
 							${newContent}
 							${codeblock}`);
-							await msg.discord.channel.send(embed);
+							await msg.discord.channel.send({ embeds: [embed] });
 						}
 						break;
 					case "file":
@@ -255,7 +262,7 @@ export default class Raw extends BaseCommand {
 							oneLine`The raw message has been sent as a .txt file.`
 						);
 						await msg.discord.channel.send({
-							embed: embed,
+							embeds: [embed],
 							files: [attachment],
 						});
 						break;
@@ -270,7 +277,7 @@ export default class Raw extends BaseCommand {
 								{ contentType: "text/plain" }
 							);
 						} catch (error) {
-							Logger.error(error.stack);
+							Logger.error((error as Error).stack);
 							await msg.discord.channel.send(
 								`${msg.discord.author}, something went wrong when creating the paste!`
 							);
@@ -288,7 +295,7 @@ export default class Raw extends BaseCommand {
 								Hastebin link: ${link.replace("/raw/", "/")}
 								Raw link: ${link}`
 							);
-						await msg.discord.channel.send(embed);
+						await msg.discord.channel.send({ embeds: [embed] });
 						break;
 					default:
 						throw new TypeError(
@@ -320,10 +327,7 @@ export default class Raw extends BaseCommand {
 	static async getMessageFromSnowflake(
 		snowflake: string,
 		channels: Discord.Channel[],
-		commandChannel:
-			| Discord.TextChannel
-			| Discord.NewsChannel
-			| Discord.DMChannel
+		commandChannel: Discord.TextBasedChannels
 	): Promise<Discord.Message | undefined> {
 		let newMsg: Discord.Message | undefined;
 		if (snowflake) {
@@ -333,12 +337,9 @@ export default class Raw extends BaseCommand {
 
 				// If the channel is a DM, and the message being found
 				// isn't the same place, the message shouldn't be leaked
-				const channel = element as
-					| Discord.TextChannel
-					| Discord.NewsChannel
-					| Discord.DMChannel;
+				const channel = element as Discord.TextBasedChannels;
 				if (
-					commandChannel.type == "dm" &&
+					commandChannel.type == "DM" &&
 					commandChannel.id != channel.id
 				) {
 					continue;
@@ -405,7 +406,7 @@ export default class Raw extends BaseCommand {
 			| Discord.DMChannel;
 		if (!channel) {
 			return `I couldn't find the channel from the message link!`;
-		} else if (channel.type == "dm" && author.id != channel.id) {
+		} else if (channel.type == "DM" && author.id != channel.id) {
 			return `I won't retrieve private DMs into a public server.`;
 		}
 

@@ -16,6 +16,14 @@ ormconfig.json
 *.sqbpro
 *.sqlite.backup
 
+# Lazy PollBotPlus removal
+src/plugins/Fun/events/OnGuildCreate.ts
+src/plugins/Info/commands/Invite.ts
+src/plugins/Info/commands/Support.ts
+src/plugins/Info/commands/Tip.ts
+src/plugins/Info/commands/Vote.ts
+
+
 # Don't need js files
 src/**/*.js
 

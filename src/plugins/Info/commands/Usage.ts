@@ -40,7 +40,7 @@ export default class extends BaseCommand {
 					`
 				);
 
-			await msg.discord.channel.send(embed);
+			await msg.discord.channel.send({ embeds: [embed] });
 		}
 
 		return true;

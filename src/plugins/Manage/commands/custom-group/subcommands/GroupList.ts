@@ -69,12 +69,14 @@ export default class extends BaseSubcommand {
 							? template
 							: "There are no groups! Try `.group add` to create new groups."
 					);
-				await msg.discord?.channel.send(
-					await msg.client.formatting.formatEmbed(
-						embed,
-						await msg.getPlace()
-					)
-				);
+				await msg.discord?.channel.send({
+					embeds: [
+						await msg.client.formatting.formatEmbed(
+							embed,
+							await msg.getPlace()
+						),
+					],
+				});
 				return true;
 			}
 		} else {

@@ -17,12 +17,24 @@ export default class Link extends BaseCommand {
 			aliases: ["discohook", "discohookembed", "embed", "lnk", "restore"],
 			about: "Recreates a Discord message into Discohook.",
 			usage: "[id|link|content]",
+			userPermissions: {
+				botOwnersOnly: true,
+				checkAutomatically: false,
+			},
 		});
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
+			return false;
 		}
 
 		if (msg.discord) {
@@ -53,7 +65,7 @@ export default class Link extends BaseCommand {
 						.setTitle("Message Link")
 						.setDescription(`[${shortUrl}](${shortUrl})`);
 
-					await msg.discord.channel.send(embed);
+					await msg.discord.channel.send({ embeds: [embed] });
 					return true;
 				}
 			}

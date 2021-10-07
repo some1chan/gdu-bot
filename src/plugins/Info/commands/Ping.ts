@@ -52,7 +52,10 @@ export default class extends BaseCommand {
 				.setTitle("Latency Info").setDescription(stripIndent`
 				🏓 \`Message Latency\` - ${botDateNumber - userDateNumber}ms
 				🤖 \`API Latency\` - ${Math.round(discordMsg.client.ws.ping)}ms`);
-			await newDiscordMsg.edit(newDiscordMsg.content, embed);
+			await newDiscordMsg.edit({
+				content: newDiscordMsg.content,
+				embeds: [embed],
+			});
 
 			return true;
 		} else {

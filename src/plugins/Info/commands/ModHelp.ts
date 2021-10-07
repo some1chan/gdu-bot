@@ -2,6 +2,7 @@ import {
 	BaseMessage,
 	BasePlugin,
 	BaseCommand,
+	Discord,
 	EmbedHelper,
 	Logger,
 	FriendlyError,
@@ -20,19 +21,11 @@ const data: HelpData[][] = [
 			commands: ["toggleevent"],
 		},
 		{
-			group: "Reaction Roles",
-			commands: ["reactionrole"],
-		},
-		{
-			group: "Voice Queue",
-			commands: ["queue"],
-		},
-	],
-	[
-		{
 			group: "Manage",
 			commands: ["command", "group"],
 		},
+	],
+	[
 		{
 			group: "Markdown",
 			commands: ["channel", "emoji", "user", "role", "raw"],
@@ -63,7 +56,7 @@ export default class extends BaseCommand {
 		}
 
 		const min = 1;
-		const max = 2;
+		const max = data.length;
 		const pageNum = Math.min(
 			Math.max(min, Number(msg.args[0] ?? min)),
 			max
@@ -80,14 +73,18 @@ export default class extends BaseCommand {
 				.find(role => role.name == "Mods")
 				?.toString();
 			if (!modRoleString) {
-				modRoleString = "<@&462342299171684364>";
+				modRoleString = `<@&${
+					process.env.MOD_ROLE_ID ?? "462342299171684364"
+				}>` as Discord.RoleMention;
 			}
 
 			let communitySupportRole = msg.discord.guild?.roles.cache
 				.find(role => role.name == "Community Support")
 				?.toString();
 			if (!communitySupportRole) {
-				communitySupportRole = "<@&758771336289583125>";
+				communitySupportRole = `<@&${
+					process.env.COMMUNITY_ROLE_ID ?? "758771336289583125"
+				}>` as Discord.RoleMention;
 			}
 
 			const embed = await this.client.formatting.formatEmbed(
@@ -119,12 +116,12 @@ export default class extends BaseCommand {
 			);
 
 			try {
-				await msg.discord.channel.send(embed);
+				await msg.discord.channel.send({ embeds: [embed] });
 			} catch (error) {
 				await msg.discord.channel.send(
 					`${msg.discord.author}, the embed size for help is too large! Contact one of the bot masters`
 				);
-				Logger.error(error.stack);
+				Logger.error((error as Error).stack);
 			}
 			return true;
 		}

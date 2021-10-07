@@ -66,6 +66,11 @@ export default class extends BaseCommand {
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
+		if (!msg.args || !msg.args[0]) {
+			await msg.sendHelpForCommand();
+			return false;
+		}
+
 		const randomIndex = Utils.randomNumber(
 			0,
 			this.randomResponses.length - 1

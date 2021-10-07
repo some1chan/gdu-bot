@@ -1,18 +1,19 @@
 console.log("Starting bot... this might take a while.");
 
+const botName = "smol";
 // https://www.stefanjudis.com/today-i-learned/measuring-execution-time-more-precisely-in-the-browser-and-node-js/
 const startTime = process.hrtime();
 
 import "reflect-metadata";
-import { Logger, LoginOptions, Utils, version } from "@framedjs/core";
+import { Discord, Logger, LoginOptions, Utils, version } from "@framedjs/core";
 import { CustomClient } from "./structures/CustomClient";
+import { DatabaseManager } from "./managers/DatabaseManager";
 import { TypeORMLogger } from "./logger/TypeORMLogger";
 import * as TypeORM from "typeorm";
 import Colors from "colors";
 import Winston from "winston";
 import fs from "fs";
 import path from "path";
-import { DatabaseManager } from "./managers/DatabaseManager";
 
 // Sets up loggers
 Logger.level = process.env.LOGGER_LEVEL ? process.env.LOGGER_LEVEL : "silly";
@@ -45,23 +46,25 @@ try {
 	const packageJson = JSON.parse(packageFile);
 	appVersion = packageJson.version;
 } catch (error) {
-	Logger.error(error.stack);
+	Logger.error((error as Error).stack);
 	Logger.warn("Using 0.0.0 as the app version by default.");
 	appVersion = "0.0.0";
 }
-
-Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded imports.`);
+const importTime = Utils.hrTimeElapsed(startTime);
 
 async function start() {
 	Logger.info(
-		`Starting GDU Bot v${appVersion}, currently running Framed.js v${version}.`
+		`Starting ${botName} v${appVersion}, currently running Framed.js v${version}.`
 	);
+	Logger.verbose(`${importTime}s - Loaded imports.`);
 
 	// Get connection options, and adds the logger
 	let connectionOptions: TypeORM.ConnectionOptions;
 
 	//#region Connection Options
 	if (process.env.NODE_ENV == "development") {
+		// If we're in a dev environment,
+		// the bot attempts to find ormconfig.ts first
 		try {
 			const ormconfig = require("../data/ormconfig.ts");
 			if (ormconfig.default) {
@@ -117,16 +120,23 @@ async function start() {
 
 	// Initializes the client
 	const client = new CustomClient({
+		appVersion: appVersion,
+		autoInitialize: {
+			api: false,
+			commands: false,
+			plugins: false,
+			provider: false,
+		},
 		defaultPrefix: process.env.DEFAULT_PREFIX,
+
+		discord: {
+			botOwners: process.env.BOT_OWNERS?.split(","),
+		},
 		footer: [
 			"$(command default.bot.info help)",
 			"$(command default.bot.fun poll)",
 			"$(command com.geekoverdrivestudio.dailies dailies)",
 		],
-		appVersion: appVersion,
-		discord: {
-			botOwners: "200340393596944384",
-		},
 	});
 
 	// Load plugins
@@ -135,86 +145,48 @@ async function start() {
 		filter: /^(.+plugin)\.(js|ts)$/,
 		excludeDirs: /^(.*)\.(git|svn)$|^(.*)subcommands(.*)$/,
 	});
-	Logger.info(`${Utils.hrTimeElapsed(startTime)}s - Loaded custom plugins.`);
+	Logger.verbose(
+		`${Utils.hrTimeElapsed(startTime)}s - Loaded custom plugins.`
+	);
 
 	// Initializes providers, and providers
 	await client.provider.init();
 	await client.database.init();
 
-	//#region Creates login data
 	const loginData: LoginOptions[] = [
 		{
 			type: "discord",
 			discord: {
 				token: process.env.DISCORD_TOKEN,
+				clientOptions: {
+					allowedMentions: {
+						parse: ["users", "roles"],
+					},
+					intents: [
+						"DIRECT_MESSAGES",
+						"DIRECT_MESSAGE_REACTIONS",
+						"GUILDS",
+						"GUILD_EMOJIS_AND_STICKERS",
+						"GUILD_MESSAGES",
+						"GUILD_MESSAGE_REACTIONS",
+					],
+					partials: ["MESSAGE", "CHANNEL", "REACTION", "USER"],
+					makeCache: Discord.Options.cacheWithLimits({
+						MessageManager: 50,
+						PresenceManager: 0,
+					}),
+				},
 			},
 		},
 	];
-
-	if (
-		process.env.TWITCH_ACCESS_TOKEN &&
-		process.env.TWITCH_CLIENT_ID &&
-		process.env.TWITCH_CLIENT_SECRET &&
-		process.env.TWITCH_REFRESH_TOKEN &&
-		process.env.TWITCH_CHANNELS
-	) {
-		// If all the environmental variable values exist, push Twitch as a possible login
-		loginData.push({
-			type: "twitch",
-			twitch: {
-				accessToken: process.env.TWITCH_ACCESS_TOKEN,
-				clientId: process.env.TWITCH_CLIENT_ID,
-				clientSecret: process.env.TWITCH_CLIENT_SECRET,
-				refreshToken: process.env.TWITCH_REFRESH_TOKEN,
-				clientOptions: {
-					channels: process.env.TWITCH_CHANNELS.split(","),
-					logger: {
-						// name: "",
-						timestamps: false,
-						// colors: false,
-						emoji: false,
-					},
-				},
-			},
-		});
-	}
-	//#endregion
 
 	// Login
 	await client.login(loginData);
 
 	const hrTimeElapsed = Utils.hrTimeElapsed(startTime);
 	Logger.info(
-		`Done (${hrTimeElapsed}s)! GDU Bot v${appVersion} (Framed.js v${version}) has been loaded.`
+		`Done (${hrTimeElapsed}s)! ${botName} v${appVersion} (Framed.js v${version}) has been loaded.`
 	);
-
-	client.discord.client
-		?.generateInvite({
-			permissions: [
-				// Likely required for most bots
-				"SEND_MESSAGES",
-
-				// Used in help command, but also allows the potential to use emojis from other servers
-				"USE_EXTERNAL_EMOJIS",
-
-				// Used for getting old messages with polls, after a restart
-				"READ_MESSAGE_HISTORY",
-
-				// Reactions and embeds needed for polls
-				"ADD_REACTIONS",
-				"EMBED_LINKS",
-
-				// Extra permissions for just-in-case
-				"MANAGE_MESSAGES",
-				"VIEW_CHANNEL",
-
-				// CUSTOM BOT STUFF
-				// Needs to give user a role
-				"MANAGE_ROLES",
-			],
-		})
-		.then(link => Logger.info(`Generated bot invite link:\n${link}`))
-		.catch(Logger.error);
 }
 
 start();

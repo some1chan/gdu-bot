@@ -46,13 +46,13 @@ export default class extends BaseSubcommand {
 				} catch (error) {
 					if (
 						error instanceof ReferenceError ||
-						(error.message as string).includes("default group")
+						((error as Error).message as string).includes("default group")
 					) {
 						await msg.discord?.channel.send(
-							`${msg.discord.author}, ${error.message}`
+							`${msg.discord.author}, ${(error as Error).message}`
 						);
 					} else {
-						Logger.error(error.stack);
+						Logger.error((error as Error).stack);
 					}
 					return false;
 				}

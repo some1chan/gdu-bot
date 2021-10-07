@@ -69,7 +69,7 @@ export default class extends BaseCommand {
 						.setDescription(`\`${newMemberOrUser}\``)
 						.addField("Output", `${newMemberOrUser}`);
 
-					await msg.discord.channel.send(embed);
+					await msg.discord.channel.send({ embeds: [embed] });
 					return true;
 				} else {
 					throw new NotFoundError({

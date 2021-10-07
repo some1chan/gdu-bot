@@ -10,8 +10,6 @@ import {
 } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 import { CustomClient } from "../../../structures/CustomClient";
-import { DatabaseManager } from "../../../managers/DatabaseManager";
-import Plugin from "../../../database/entities/Plugin";
 import os from "os";
 
 export default class extends BaseCommand {
@@ -34,35 +32,6 @@ export default class extends BaseCommand {
 			);
 		}
 
-		// Attempts to find dailies version
-		let dailiesVersion = "???";
-		try {
-			const connection = this.client.database.connection;
-			if (!connection) {
-				throw new Error(DatabaseManager.errorNoConnection);
-			}
-			const pluginId = "com.geekoverdrivestudio.dailies";
-			const pluginRepo = connection.getRepository(Plugin);
-			const plugin = await pluginRepo.findOne({
-				where: {
-					id: pluginId,
-				},
-			});
-			if (!plugin) {
-				throw new Error(
-					Utils.util.format(
-						DatabaseManager.errorNotFound,
-						"plugin",
-						pluginId
-					)
-				);
-			}
-
-			dailiesVersion = plugin.data.version as string;
-		} catch (error) {
-			Logger.error(error.stack);
-		}
-
 		// For debugging
 		// eslint-disable-next-line prefer-const
 		let uptime = process.uptime();
@@ -70,9 +39,7 @@ export default class extends BaseCommand {
 
 		// The rest of the data
 		const osArch = `${os.platform()}/${os.arch()}`;
-		const nodeEnvironment = process.env.NODE_ENV
-			? `${process.env.NODE_ENV}`
-			: "";
+		const nodeEnvironment = process.env.NODE_ENV;
 		const uptimeText = this.secondsToDhms(uptime);
 		const ramUsage = process.memoryUsage().rss / 1024 / 1024;
 		const ramUsageText = `${Number(ramUsage).toFixed(1)}`;
@@ -92,17 +59,14 @@ export default class extends BaseCommand {
 				- OS/Arch:      ${osArch}
 				- Environment:  ${nodeEnvironment}
 				${codeblock}${codeblock}yml
-				Framed.js Bot:
+				Bot:
 				- Uptime:       ${uptimeText}
 				- RAM Usage:    ${ramUsageText} MiB
-				- Back-End:     ${backEnd}
 				- Bot Version:  ${botVersion}
-				${codeblock}${codeblock}yml
-				Dailies Bot:
-				- Bot Version:  v${dailiesVersion}
+				- Framed.js:    ${backEnd}
 				${codeblock}
 				`);
-			await msg.discord.channel.send(embed);
+			await msg.discord.channel.send({ embeds: [embed] });
 			return true;
 		} else {
 			if (msg.command != "uptime") {

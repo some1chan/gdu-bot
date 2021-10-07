@@ -23,8 +23,8 @@ export default class extends BaseSubcommand {
 
 	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		if (!this.hasUserPermission(msg)) {
+			await this.sendUserPermissionErrorMessage(msg);
 			return false;
 		}
 
@@ -126,13 +126,13 @@ export default class extends BaseSubcommand {
 							);
 						} catch (error) {
 							Logger.error(
-								`Failed to delete response\n${error.stack}`
+								`Failed to delete response\n${(error as Error).stack}`
 							);
 						}
 					}
 				} catch (error) {
 					// Outputs error
-					Logger.error(`${error.stack}`);
+					Logger.error(`${(error as Error).stack}`);
 					return undefined;
 				}
 

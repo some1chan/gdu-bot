@@ -42,11 +42,11 @@ export default class extends BaseCommand {
 			// <@000000000000000000> - Profile Picture
 			// `
 			// );
-			await msg.discord.channel.send(embed);
+			await msg.discord.channel.send({ embeds: [embed] });
 			return true;
 		} else {
 			msg.send(
-				`Pixel Pete is a collection of custom bots for Game Dev Underground.`
+				`smol is a collection of custom bots for Game Dev Underground.`
 			);
 		}
 		return false;

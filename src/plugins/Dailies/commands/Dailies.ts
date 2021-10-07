@@ -94,7 +94,7 @@ export default class extends BaseCommand {
 					`${existingFooterText}\n${newFooterText}`,
 					embed.footer?.iconURL
 				);
-				await msg.discord.channel.send(embed);
+				await msg.discord.channel.send({ embeds: [embed] });
 				return true;
 			}
 		}

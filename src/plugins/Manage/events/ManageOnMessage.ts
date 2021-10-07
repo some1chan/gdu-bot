@@ -41,7 +41,7 @@ export default class extends BaseEvent {
 		// 				await msg.member.roles.add(optInHeaderRole);
 		// 			}
 		// 		} catch (error) {
-		// 			Logger.error(error.stack);
+		// 			Logger.error((error as Error).stack);
 		// 		}
 		// 	}
 		// }

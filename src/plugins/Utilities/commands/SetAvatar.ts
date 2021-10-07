@@ -14,15 +14,25 @@ export default class extends BaseCommand {
 			about: "Sets the bot's avatar.",
 			usage: "<image URL>",
 			userPermissions: {
-				discord: {
-					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
-				},
+				botOwnersOnly: true,
+				checkAutomatically: false,
 			},
 		});
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
+			return false;
+		}
+
 		if (msg instanceof DiscordMessage) {
 			const argsContent = msg.getArgsContent();
 			const attachment = msg.discord.msg?.attachments?.first();
@@ -37,25 +47,20 @@ export default class extends BaseCommand {
 				return false;
 			}
 
-			try {
-				if (msg.discord) {
-					await msg.discord.client.user?.setAvatar(url);
+			if (msg.discord) {
+				await msg.discord.client.user?.setAvatar(url);
 
-					const embed = EmbedHelper.getTemplate(
-						msg.discord,
-						await EmbedHelper.getCheckOutFooter(msg, this.id)
+				const embed = EmbedHelper.getTemplate(
+					msg.discord,
+					await EmbedHelper.getCheckOutFooter(msg, this.id)
+				)
+					.setTitle("Changed Avatar")
+					.setDescription(
+						`The bot avatar has been changed to this image!`
 					)
-						.setTitle("Changed Avatar")
-						.setDescription(
-							`The bot avatar has been changed to this image!`
-						)
-						.setThumbnail(url);
-					await msg.discord.channel.send(embed);
-					return true;
-				}
-			} catch (error) {
-				Logger.error(error);
-				throw new Error(error);
+					.setThumbnail(url);
+				await msg.discord.channel.send({ embeds: [embed] });
+				return true;
 			}
 		}
 

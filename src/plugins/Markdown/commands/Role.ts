@@ -26,7 +26,7 @@ export default class extends BaseCommand {
 	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.discord) {
-				if (!msg.discord.guild || msg.discord.channel.type == "dm") {
+				if (!msg.discord.guild || msg.discord.channel.type == "DM") {
 					msg.discord.channel.send(
 						`${msg.discord.author}, you must be in a Discord server in order to run this command!`
 					);
@@ -53,7 +53,7 @@ export default class extends BaseCommand {
 						.setTitle("Role Formatting")
 						.setDescription(`\`${newRole}\``)
 						.addField("Output", `${newRole}`);
-					await msg.discord.channel.send(embed); // Uncomment me!
+					await msg.discord.channel.send({ embeds: [embed] }); // Uncomment me!
 					return true;
 				} else {
 					throw new NotFoundError({

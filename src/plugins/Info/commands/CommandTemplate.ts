@@ -1,4 +1,4 @@
-import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin, Logger } from "@framedjs/core";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -6,13 +6,23 @@ export default class extends BaseCommand {
 			id: "commandtemplate",
 			about: "Not a real command. Instead, you should copy me!",
 			usage: "<required param> [optional param]",
+			userPermissions: {
+				botOwnersOnly: true,
+				checkAutomatically: false,
+			},
 		});
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
-		// Checks for permission manually
-		if (!this.hasPermission(msg, this.userPermissions)) {
-			await this.sendPermissionErrorMessage(msg);
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
 			return false;
 		}
 

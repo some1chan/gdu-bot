@@ -4,14 +4,15 @@ import {
 	BaseMessage,
 	BasePlugin,
 	Discord,
+	DiscordMessage,
 	EmbedHelper,
+	HelpData,
 	FriendlyError,
 	InlineOptions,
 	Logger,
 	Place,
 } from "@framedjs/core";
 import { oneLine, oneLineInlineLists, stripIndents } from "common-tags";
-import { HelpData } from "@framedjs/core";
 import { CustomClient } from "../../../structures/CustomClient";
 
 const data: HelpData[] = [
@@ -59,9 +60,13 @@ export default class Help extends BaseCommand {
 			\`{{prefix}}{{id}} dailies\`
 			`,
 			inline: true,
+			botPermissions: {
+				discord: {
+					permissions: ["EMBED_LINKS", "SEND_MESSAGES"],
+				},
+			},
 		});
 	}
-
 	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args) {
 			if (msg.args[0]) {
@@ -72,10 +77,9 @@ export default class Help extends BaseCommand {
 						msg,
 						this.id
 					);
-					for await (const embed of embeds) {
-						await msg.discord.channel.send(embed);
-					}
+					await msg.discord.channel.send({ embeds });
 				}
+
 				return true;
 			} else {
 				return this.showHelpAll(msg);
@@ -112,7 +116,7 @@ export default class Help extends BaseCommand {
 				)
 				.addFields(helpFields);
 
-			await msg.discord.channel.send(embed);
+			await msg.discord.channel.send({ embeds: [embed] });
 			return true;
 		}
 		return false;
@@ -272,13 +276,8 @@ export default class Help extends BaseCommand {
 		// The command/subcommand that has the data needed
 		const primaryCommand = finalSubcommand ?? command;
 
-		let {
-			about,
-			description,
-			examples,
-			notes,
-			usage,
-		} = primaryCommand.getCommandNotationFormatting(place);
+		let { about, description, examples, notes, usage } =
+			primaryCommand.getCommandNotationFormatting(place);
 
 		// Get the description
 		if (!description) {

@@ -4,9 +4,9 @@ import {
 	BaseCommand,
 	EmbedHelper,
 	Logger,
+	Discord,
 } from "@framedjs/core";
-import { commaListsAnd, oneLineCommaLists } from "common-tags";
-import { DateTime } from "luxon";
+import { oneLine, oneLineCommaLists } from "common-tags";
 
 export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
@@ -14,6 +14,12 @@ export default class extends BaseCommand {
 			id: "server",
 			about: "View server stats.",
 		});
+	}
+
+	// https://gist.github.com/foobball/f29ba5ddc0fd872d4311bed8fd306f39
+	snowflakeToDate(snowflake: string): Date {
+		const dateBits = Number(BigInt.asUintN(64, BigInt(snowflake)) >> 22n);
+		return new Date(dateBits + 1420070400000);
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
@@ -35,14 +41,14 @@ export default class extends BaseCommand {
 
 					guild.channels.cache.forEach(channel => {
 						switch (channel.type) {
-							case "category":
+							case "GUILD_CATEGORY":
 								categoriesNumber++;
 								break;
-							case "news":
-							case "text":
+							case "GUILD_NEWS":
+							case "GUILD_TEXT":
 								textNumber++;
 								break;
-							case "voice":
+							case "GUILD_VOICE":
 								voiceNumber++;
 								break;
 						}
@@ -51,42 +57,51 @@ export default class extends BaseCommand {
 					let owner = "Error";
 					try {
 						owner = (
-							await msg.discord.guild.members.fetch(guild.ownerID)
+							await msg.discord.guild.members.fetch(guild.ownerId)
 						).toString();
 					} catch (error) {
-						Logger.error(error.stack);
+						Logger.error((error as Error).stack);
 					}
 
-					// guild.setChannelPositions();
+					let unix = this.snowflakeToDate(
+						msg.discord.guild.id
+					).getTime();
+					unix = (unix / 1000) | 0;
 					const embed = EmbedHelper.getTemplate(
 						msg.discord,
 						await EmbedHelper.getCheckOutFooter(msg, this.id)
 					)
 						.setTitle("Server Stats")
 						.addField("Owner", owner, true)
-						.addField("Members", guild.memberCount, true)
+						.addField("Members", `${guild.memberCount}`, true)
 						.addField(
 							"Channels",
-							`${categoriesNumber} categories,\n${textNumber} text, ${voiceNumber} voice`,
-							true
-						)
-						.addField("Region", guild.region, true)
-						.addField("Role Count", guild.roles.cache.size, true)
-						.addField(
-							"Created",
-							`${this.getTimeAgo(guild.createdAt)}`,
+							oneLine`${categoriesNumber} categories,\n${textNumber} text, ${voiceNumber} voice`,
 							true
 						)
 						.addField(
-							"Roles",
-							oneLineCommaLists`${guild.roles.cache.array()}`
-						);
+							"Role Count",
+							`${guild.roles.cache.size}`,
+							true
+						)
+						.addField("Created", `<t:${unix}>, `, true);
+					// .addField(
+					// 	"Roles",
+					// 	oneLineCommaLists`${Array.from(
+					// 		guild.roles.cache.values()
+					// 	)}`
+					// );
+					Logger.debug(
+						oneLineCommaLists`${Array.from(
+							guild.roles.cache.values()
+						)}`
+					);
 
 					if (iconUrl) {
 						embed.setThumbnail(iconUrl);
 					}
 
-					await msg.discord.channel.send(embed);
+					await msg.discord.channel.send({ embeds: [embed] });
 
 					return true;
 				} else {
@@ -97,47 +112,5 @@ export default class extends BaseCommand {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Gets a time ago. An example output would be "2 months, 15 days and 8 hours ago".
-	 *
-	 * @param createdAt The guild's creation date
-	 *
-	 * @returns Time ago
-	 */
-	private getTimeAgo(createdAt: Date): string {
-		const finalList: string[] = [];
-		const list: string[] = [];
-
-		const createdDuration = DateTime.fromJSDate(createdAt)
-			.diffNow(["years", "months", "days", "hours"])
-			.negate();
-
-		const year =
-			createdDuration.years == 0 ? "" : `${createdDuration.years} years`;
-		const months =
-			createdDuration.months == 0
-				? ""
-				: `${createdDuration.months} months`;
-		const days =
-			createdDuration.days == 0 ? "" : `${createdDuration.days} days`;
-		const hours =
-			createdDuration.hours == 0
-				? ""
-				: `${Math.round(createdDuration.hours)} hours`;
-		const minutes =
-			createdDuration.minutes == 0
-				? ""
-				: `${Math.round(createdDuration.minutes)}`;
-		list.push(year, months, days, hours, minutes);
-
-		list.forEach(arg => {
-			if (arg.length != 0) {
-				finalList.push(arg);
-			}
-		});
-
-		return commaListsAnd`${finalList} ago`;
 	}
 }

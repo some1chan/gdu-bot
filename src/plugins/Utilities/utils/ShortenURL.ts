@@ -14,6 +14,6 @@ export async function shorten(url: string, callback: Callback): Promise<void> {
 		const response = results.data;
 		callback(response, undefined);
 	} catch (err) {
-		callback(undefined, err.stack);
+		callback(undefined, err as Error);
 	}
 }

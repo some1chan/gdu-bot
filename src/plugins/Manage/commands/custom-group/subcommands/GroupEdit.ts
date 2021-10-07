@@ -86,7 +86,7 @@ export default class extends BaseSubcommand {
 							`${msg.discord.author}, ${error.message}`
 						);
 					} else {
-						Logger.error(error.stack);
+						Logger.error((error as Error).stack);
 					}
 					return false;
 				}

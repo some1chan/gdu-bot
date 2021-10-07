@@ -22,7 +22,7 @@ export default class extends BaseCommand {
 			\`{{prefix}}{{id}} "pls "\`
 			`,
 			notes: oneLine`
-			By changing the prefix, simple polls with the \`once\` option won't work.
+			By changing the prefix, simple polls with the \`single\` option won't work.
 			If those polls need to keep working, edit that message to use your new prefix.
 			Embed polls aren't affected by prefix changes.
 			`,
@@ -31,6 +31,7 @@ export default class extends BaseCommand {
 				examples: true,
 			},
 			userPermissions: {
+				checkAutomatically: false,
 				discord: {
 					permissions: ["MANAGE_GUILD"],
 				},
@@ -40,6 +41,20 @@ export default class extends BaseCommand {
 
 	async run(msg: BaseMessage): Promise<boolean> {
 		if (msg.args && msg.args[0]) {
+			// Manual user permission check
+			const permsResult = this.checkUserPermissions(
+				msg,
+				this.userPermissions
+			);
+			if (!permsResult.success) {
+				await this.sendUserPermissionErrorMessage(
+					msg,
+					this.userPermissions,
+					permsResult
+				);
+				return false;
+			}
+
 			if (msg.args[0].length > 24) {
 				throw new FriendlyError(
 					`The prefix specified is too long (>24 characters)!`
@@ -71,7 +86,7 @@ export default class extends BaseCommand {
 									.setDescription(
 										`The prefix was successfully changed to \`${newPrefix}\`.`
 									);
-								await msg.discord.channel.send(embed);
+								await msg.discord.channel.send({ embeds: [embed] });
 								break;
 							}
 						default:
@@ -82,7 +97,7 @@ export default class extends BaseCommand {
 					}
 					return true;
 				} catch (error) {
-					Logger.error(error.stack);
+					Logger.error((error as Error).stack);
 					return false;
 				}
 			} else {

@@ -22,7 +22,10 @@ export default class extends BaseCommand {
 			userPermissions: {
 				discord: {
 					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
+					roles: [
+						process.env.MOD_ROLE_ID ?? "462342299171684364",
+						process.env.COMMUNITY_ROLE_ID ?? "758771336289583125",
+					],
 				},
 			},
 		});
@@ -30,10 +33,18 @@ export default class extends BaseCommand {
 
 	sortChannelCategories(
 		guild: Discord.Guild
-	): Discord.Collection<string, Discord.GuildChannel> {
-		return guild.channels.cache
-			.filter(channel => channel.type == "category")
-			.sort((a, b) => {
+	): (Discord.GuildChannel | Discord.ThreadChannel)[] {
+		let i = Array.from(guild.channels.cache.values()).filter(
+			channel =>
+				channel instanceof Discord.GuildChannel &&
+				channel.type == "GUILD_CATEGORY"
+		);
+
+		i.sort((a, b) => {
+			if (
+				a instanceof Discord.GuildChannel &&
+				b instanceof Discord.GuildChannel
+			) {
 				if (a.position < b.position) {
 					return -1;
 				} else if (a.position > b.position) {
@@ -41,16 +52,22 @@ export default class extends BaseCommand {
 				} else {
 					return 0;
 				}
-			});
+			}
+			return 0;
+		});
+
+		return i;
 	}
 
 	debugOutput(
-		sorted: Discord.Collection<string, Discord.GuildChannel>
+		sortedArray: (Discord.GuildChannel | Discord.ThreadChannel)[]
 	): void {
 		let newStr = "";
-		const sortedArray = sorted.array();
 		for (let i = 0; i < sortedArray.length; i++) {
 			const channel = sortedArray[i];
+
+			if (channel.type != "GUILD_CATEGORY") continue;
+
 			// If the element exceeds the check, don't give it a new line
 			const newLine = i + 1 < sortedArray.length ? "\n" : "";
 			newStr += `${channel.name} | pos:${channel.position} - rawPos:${channel.rawPosition}${newLine}`;
@@ -65,9 +82,9 @@ export default class extends BaseCommand {
 				throw new Error(
 					`Environment variable EVENT_CATEGORY_CHANNEL_ID wasn't set`
 				);
-			} else if (!process.env.INFO_CATEGORY_CHANNEL_ID) {
+			} else if (!process.env.PRIVATE_CATEGORY_CHANNEL_ID) {
 				throw new Error(
-					`Environment variable INFO_CATEGORY_CHANNEL_ID wasn't set`
+					`Environment variable PRIVATE_CATEGORY_CHANNEL_ID wasn't set`
 				);
 			} else if (!process.env.ARCHIVE_CATEGORY_CHANNEL_ID) {
 				throw new Error(
@@ -80,7 +97,7 @@ export default class extends BaseCommand {
 			}
 			//#endregion
 
-			//#region Gets mainGuild, infoCategoryChannel, eventCategoryChannel, and archiveCategoryChannel
+			//#region Gets mainGuild, privateCategoryChannel, eventCategoryChannel, and archiveCategoryChannel
 			const mainGuild = msg.discord.client.guilds.cache.get(
 				process.env.MAIN_GUILD_ID
 			);
@@ -90,18 +107,18 @@ export default class extends BaseCommand {
 				);
 			}
 
-			const infoCategoryChannel = mainGuild.channels.cache.get(
-				process.env.INFO_CATEGORY_CHANNEL_ID
+			const privateCategoryChannel = mainGuild.channels.cache.get(
+				process.env.PRIVATE_CATEGORY_CHANNEL_ID
 			);
-			if (!infoCategoryChannel) {
+			if (!privateCategoryChannel) {
 				throw new Error(
-					`infoCategoryChannel is undefined (ID searched: ${process.env.INFO_CATEGORY_CHANNEL_ID})`
+					`privateCategoryChannel is undefined (ID searched: ${process.env.PRIVATE_CATEGORY_CHANNEL_ID})`
 				);
 			} else if (
-				!(infoCategoryChannel instanceof Discord.CategoryChannel)
+				!(privateCategoryChannel instanceof Discord.CategoryChannel)
 			) {
 				throw new Error(
-					`(infoCategoryChannel instanceof Discord.CategoryChannel is false`
+					`(privateCategoryChannel instanceof Discord.CategoryChannel is false`
 				);
 			}
 			const eventCategoryChannel = mainGuild.channels.cache.get(
@@ -140,13 +157,15 @@ export default class extends BaseCommand {
 				if (msg.args[0] == "record") {
 					recordingChannel = mainGuild.channels.cache.get(
 						process.env.RECORDING_CHANNEL_ID
-					);
+					) as Discord.GuildChannel;
 				}
 			}
 
 			const sorted = this.sortChannelCategories(mainGuild);
 			const normalizeList: Discord.ChannelPosition[] = [];
-			for (const [, channel] of sorted) {
+			for (const channel of sorted) {
+				if (channel.type != "GUILD_CATEGORY") continue;
+
 				normalizeList.push({
 					channel: channel.id,
 					position: channel.position,
@@ -180,7 +199,7 @@ export default class extends BaseCommand {
 							),
 						},
 					]),
-					recordingChannel?.updateOverwrite(
+					recordingChannel?.permissionOverwrites.edit(
 						recordingChannel.guild.roles.everyone,
 						{ VIEW_CHANNEL: !eventIsHappening }
 					),
@@ -190,11 +209,13 @@ export default class extends BaseCommand {
 				);
 			} else {
 				const movementList: Discord.ChannelPosition[] = [];
-				for (const [, channel] of sorted) {
+				for (const channel of sorted) {
 					if (
-						channel.id != process.env.INFO_CATEGORY_CHANNEL_ID &&
+						channel.id != process.env.PRIVATE_CATEGORY_CHANNEL_ID &&
 						channel.id != process.env.EVENT_CATEGORY_CHANNEL_ID
 					) {
+						if (channel.type != "GUILD_CATEGORY") continue;
+
 						movementList.push({
 							channel: channel.id,
 							position: channel.position + 1,
@@ -206,11 +227,11 @@ export default class extends BaseCommand {
 					mainGuild.setChannelPositions([
 						{
 							channel: eventCategoryChannel.id,
-							position: infoCategoryChannel.position + 1,
+							position: privateCategoryChannel.position + 1,
 						},
 						...movementList,
 					]),
-					recordingChannel?.updateOverwrite(
+					recordingChannel?.permissionOverwrites.edit(
 						recordingChannel.guild.roles.everyone,
 						{ VIEW_CHANNEL: !eventIsHappening }
 					),

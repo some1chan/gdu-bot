@@ -4,6 +4,7 @@ import {
 	BasePlugin,
 	Discord,
 	Logger,
+	Utils,
 } from "@framedjs/core";
 import Schedule from "node-schedule";
 
@@ -66,9 +67,11 @@ export default class extends BaseEvent {
 
 		names.forEach(name => {
 			this.presences.push({
-				activity: {
-					name: name,
-				},
+				activities: [
+					{
+						name: name,
+					},
+				],
 			});
 		});
 	}
@@ -76,14 +79,16 @@ export default class extends BaseEvent {
 	async setPresence(presenceIndex = this.presenceIndex): Promise<void> {
 		if (this.discord) {
 			try {
-				Logger.debug(
-					`Setting activity to "${this.presences[presenceIndex].activity?.name}"`
+				Logger.silly(
+					`Setting activity to "${Utils.util.inspect(
+						this.presences[presenceIndex]
+					)}"`
 				);
-				await this.discord.client?.user?.setPresence(
+				this.discord.client?.user?.setPresence(
 					this.presences[presenceIndex]
 				);
 			} catch (error) {
-				Logger.error(error.stack);
+				Logger.error((error as Error).stack);
 			}
 
 			// Increments number

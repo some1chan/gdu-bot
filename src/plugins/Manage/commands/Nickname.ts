@@ -41,7 +41,7 @@ export default class extends BaseCommand {
 								`${msg.discord?.author}, I've just changed my nickname!`
 							);
 						} catch (error) {
-							Logger.error(error.stack);
+							Logger.error((error as Error).stack);
 							await msg.discord.channel.send(
 								`${msg.discord?.author}, something went wrong! (Do I have permission to change my own nickname?)`
 							);

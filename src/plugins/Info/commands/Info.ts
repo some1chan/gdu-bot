@@ -39,7 +39,7 @@ export default class extends BaseCommand {
 						this.getHelpEmbed
 					);
 					for await (const embed of embeds) {
-						await msg.discord.channel.send(embed);
+						await msg.discord.channel.send({ embeds: [embed] });
 					}
 				}
 			} else {

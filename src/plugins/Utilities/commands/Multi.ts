@@ -29,7 +29,11 @@ export default class Multi extends BaseCommand {
 			`,
 			userPermissions: {
 				discord: {
-					permissions: ["MANAGE_GUILD"],
+					// Mods, Community Manager
+					roles: [
+						process.env.MOD_ROLE_ID ?? "462342299171684364",
+						process.env.COMMUNITY_ROLE_ID ?? "758771336289583125",
+					],
 				},
 			},
 		});

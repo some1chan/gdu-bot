@@ -62,7 +62,7 @@ export default class extends BaseCommand {
 					.setDescription(`\`${finalEmoji}\``)
 					.addField("Output", finalEmoji);
 
-				await msg.discord.channel.send(embed); // Uncomment me!
+				await msg.discord.channel.send({ embeds: [embed] }); // Uncomment me!
 				return true;
 			} else {
 				Logger.warn("unsupported");

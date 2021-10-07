@@ -22,7 +22,10 @@ export default class CustomGroup extends BaseCommand {
 				discord: {
 					permissions: ["MANAGE_MESSAGES"],
 					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
+					roles: [
+						process.env.MOD_ROLE_ID ?? "462342299171684364",
+						process.env.COMMUNITY_ROLE_ID ?? "758771336289583125",
+					],
 				},
 			},
 			paths: {

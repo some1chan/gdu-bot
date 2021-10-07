@@ -59,7 +59,7 @@ export class DatabaseManager extends Base {
 				await this.installDefaults();
 			} catch (error) {
 				Logger.error(
-					`Error happened while installing!\n${error.stack}`
+					`Error happened while installing!\n${(error as Error).stack}`
 				);
 			}
 		}
@@ -117,7 +117,7 @@ export class DatabaseManager extends Base {
 			await this.addScriptPlugins();
 		} catch (error) {
 			Logger.error(
-				`Error happened while trying to install from scripts:\n${error.stack}`
+				`Error happened while trying to install from scripts:\n${(error as Error).stack}`
 			);
 		}
 	}
@@ -456,9 +456,9 @@ export class DatabaseManager extends Base {
 			// 		response.id
 			// 	);
 			// } catch (error) {
-			// 	throw new Error(`Failed to delete response\n${error.stack}`);
+			// 	throw new Error(`Failed to delete response\n${(error as Error).stack}`);
 			// }
-			throw new Error(`Failed to add command\n${error.stack}`);
+			throw new Error(`Failed to add command\n${(error as Error).stack}`);
 		}
 	}
 

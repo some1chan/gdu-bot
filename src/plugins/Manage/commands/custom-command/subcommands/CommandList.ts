@@ -7,9 +7,8 @@ import {
 	BaseSubcommand,
 } from "@framedjs/core";
 import { oneLine, oneLineInlineLists } from "common-tags";
-import { Message } from "discord.js";
-import Command from "../../../../../database/entities/Command";
 import { CustomClient } from "../../../../../structures/CustomClient";
+import Command from "../../../../../database/entities/Command";
 
 interface Data {
 	noDescCommands: string[];
@@ -27,8 +26,8 @@ export default class extends BaseSubcommand {
 
 	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		if (!this.hasUserPermission(msg)) {
+			await this.sendUserPermissionErrorMessage(msg);
 			return false;
 		}
 
@@ -113,7 +112,7 @@ export default class extends BaseSubcommand {
 				embed.addField(key, `${desc}${noDesc}`);
 			}
 
-			await msg.discord.channel.send(embed);
+			await msg.discord.channel.send({ embeds: [embed] });
 			return true;
 		}
 

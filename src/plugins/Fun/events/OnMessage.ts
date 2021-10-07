@@ -1,4 +1,4 @@
-import { BaseEvent, BasePlugin, Discord, BaseMessage } from "@framedjs/core";
+import { BaseEvent, BasePlugin, Discord, DiscordMessage } from "@framedjs/core";
 
 export default class extends BaseEvent {
 	constructor(plugin: BasePlugin) {
@@ -33,7 +33,7 @@ export default class extends BaseEvent {
 			.trim();
 
 		if (msg.content.startsWith(legacyPollString)) {
-			const newMsg = new BaseMessage({
+			const newMsg = new DiscordMessage({
 				client: this.client,
 				content: newContent,
 				discord: {

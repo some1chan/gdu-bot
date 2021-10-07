@@ -27,6 +27,9 @@ export class CustomCommandManager extends CommandManager {
 		const prefixes: string[] = [
 			`<@!${this.client.discord.client?.user?.id}>`,
 			`<@${this.client.discord.client?.user?.id}>`,
+			`@${this.client.discord.client?.user?.username}`,
+			`@${this.client.discord.client?.user?.tag}`,
+			`${this.client.discord.client?.user?.tag}`,
 		];
 
 		// Logger.debug(`Default prefixes: ${prefixes}`);
@@ -53,13 +56,12 @@ export class CustomCommandManager extends CommandManager {
 				const place = await msg.getPlace();
 				if (place) {
 					// Attempts to runs commands through database
-					const dbCommand:
-						| Command
-						| undefined = await this.database.findCommand(
-						msg.command,
-						msg.prefix,
-						place
-					);
+					const dbCommand: Command | undefined =
+						await this.database.findCommand(
+							msg.command,
+							msg.prefix,
+							place
+						);
 
 					if (dbCommand) {
 						Logger.debug(
@@ -74,7 +76,7 @@ export class CustomCommandManager extends CommandManager {
 				}
 			}
 		} catch (error) {
-			Logger.error(error.stack);
+			Logger.error((error as Error).stack);
 		}
 
 		Logger.debug(
@@ -126,10 +128,11 @@ export class CustomCommandManager extends CommandManager {
 							}
 
 							if (embed) {
-								embed = await this.client.formatting.formatEmbed(
-									embed,
-									place
-								);
+								embed =
+									await this.client.formatting.formatEmbed(
+										embed,
+										place
+									);
 							}
 						}
 
@@ -143,10 +146,10 @@ export class CustomCommandManager extends CommandManager {
 
 							// If there's an embed, send it. If not, don't
 							if (embed) {
-								await msg.discord.channel.send(
-									formattedContent,
-									embed
-								);
+								await msg.discord.channel.send({
+									content: formattedContent,
+									embeds: [embed],
+								});
 								sentSomething = true;
 							} else {
 								await msg.discord.channel.send(
@@ -156,7 +159,7 @@ export class CustomCommandManager extends CommandManager {
 							}
 						} else if (embed) {
 							// If there is an embed but no content, send the embed
-							await msg.discord.channel.send(embed);
+							await msg.discord.channel.send({ embeds: [embed] });
 							sentSomething = true;
 						} else {
 							// If there's no embed or content, somethign went wrong

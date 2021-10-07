@@ -1,5 +1,5 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { BaseCommand, BaseMessage, BasePlugin } from "@framedjs/core";
+import { BaseCommand, BaseMessage, BasePlugin, Logger } from "@framedjs/core";
 import { stripIndent } from "common-tags";
 import Raw from "./Raw";
 
@@ -15,10 +15,8 @@ export default class extends BaseCommand {
 			\`{{prefix}}{{id}}\`
 			\`{{prefix}}{{id}} This ~~is~~ a **test**!\``,
 			userPermissions: {
-				discord: {
-					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
-				},
+				botOwnersOnly: true,
+				checkAutomatically: false,
 			},
 			inline: true,
 			// hideUsageInHelp: true,
@@ -26,8 +24,15 @@ export default class extends BaseCommand {
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
 			return false;
 		}
 

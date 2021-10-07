@@ -29,15 +29,25 @@ export default class extends BaseCommand {
 			\`{{prefix}}{{id}} { "content": "Hello!" } #bot-commands\`			
 			`,
 			userPermissions: {
-				discord: {
-					// Mods, Community Manager
-					roles: ["462342299171684364", "758771336289583125"],
-				},
+				botOwnersOnly: true,
+				checkAutomatically: false,
 			},
 		});
 	}
 
 	async run(msg: BaseMessage): Promise<boolean> {
+		// Manually checks user permission to stay silent
+		const permsResult = this.checkUserPermissions(
+			msg,
+			this.userPermissions
+		);
+		if (!permsResult.success) {
+			Logger.warn(
+				`${this.id} called by user without permission (${msg.discord?.author.id})`
+			);
+			return false;
+		}
+
 		if (msg.discord && msg.args && msg.command) {
 			let newContents = msg.getArgsContent();
 
@@ -68,9 +78,7 @@ export default class extends BaseCommand {
 			}
 
 			let channelOrMessage:
-				| Discord.TextChannel
-				| Discord.DMChannel
-				| Discord.NewsChannel
+				| Discord.TextBasedChannels
 				| Discord.Message
 				| undefined;
 
@@ -80,10 +88,11 @@ export default class extends BaseCommand {
 					if (args[1]) {
 						try {
 							if (msg.discord.guild?.channels) {
-								const tempChannel = DiscordUtils.resolveGuildChannel(
-									args[1],
-									msg.discord.guild?.channels
-								);
+								const tempChannel =
+									DiscordUtils.resolveGuildChannel(
+										args[1],
+										msg.discord.guild?.channels
+									);
 
 								if (tempChannel && tempChannel.isText()) {
 									newContents = args[0];
@@ -94,11 +103,12 @@ export default class extends BaseCommand {
 							}
 						} catch (error) {
 							if (msg.discord.guild) {
-								const tempMsg = await DiscordUtils.getMessageFromLink(
-									args[1],
-									msg.discord.client,
-									msg.discord.guild
-								);
+								const tempMsg =
+									await DiscordUtils.getMessageFromLink(
+										args[1],
+										msg.discord.client,
+										msg.discord.guild
+									);
 
 								if (tempMsg) {
 									newContents = args[0];
@@ -135,7 +145,7 @@ export default class extends BaseCommand {
 					.setDescription(
 						`Your new message(s) can be found **[here](${messages[0].url})**.`
 					);
-				await msg.discord.channel.send(embed);
+				await msg.discord.channel.send({ embeds: [embed] });
 			}
 
 			return true;

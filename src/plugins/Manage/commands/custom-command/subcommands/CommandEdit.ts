@@ -20,8 +20,8 @@ export default class extends BaseSubcommand {
 
 	async run(msg: BaseMessage): Promise<boolean> {
 		// Checks for permission
-		if (!this.hasPermission(msg)) {
-			await this.sendPermissionErrorMessage(msg);
+		if (!this.hasUserPermission(msg)) {
+			await this.sendUserPermissionErrorMessage(msg);
 			return false;
 		}
 
@@ -127,7 +127,7 @@ export default class extends BaseSubcommand {
 				command = await commandRepo.save(command);
 			} catch (error) {
 				// Outputs error
-				Logger.error(`${error.stack}`);
+				Logger.error(`${(error as Error).stack}`);
 			}
 
 			// If the command was valid, and (probably) didn't error out
