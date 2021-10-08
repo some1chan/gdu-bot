@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  gdu-bot:
+  bot:
     build: ./
     volumes:
       - ./data/:/app/data/
