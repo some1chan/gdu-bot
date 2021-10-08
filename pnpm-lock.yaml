@@ -1,6 +1,8 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@discordjs/builders': ^0.6.0
+  '@discordjs/rest': ^0.1.0-canary.0
   '@framedjs/core': 0.6.0
   '@types/common-tags': ^1.8.1
   '@types/node-emoji': ^1.8.1
@@ -9,6 +11,7 @@ specifiers:
   bufferutil: ^4.0.4
   colors: ^1.4.0
   common-tags: ^1.8.0
+  discord-api-types: ^0.23.1
   discord.js: ^13.2.0
   dotenv: ^8.6.0
   erlpack: github:discord/erlpack
@@ -29,10 +32,13 @@ specifiers:
   zlib-sync: ^0.1.7
 
 dependencies:
+  '@discordjs/builders': 0.6.0
+  '@discordjs/rest': 0.1.0-canary.0
   '@framedjs/core': 0.6.0_08dfb62ddf1fce6025d3b53fe25d631d
   axios: 0.21.4
   colors: 1.4.0
   common-tags: 1.8.0
+  discord-api-types: 0.23.1
   discord.js: 13.2.0_b2e6c579793e9551e64081320e3d8aea
   dotenv: 8.6.0
   hastebin: 0.2.1
