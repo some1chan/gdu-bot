@@ -10,6 +10,8 @@ import {
 } from "@framedjs/core";
 import { oneLine, stripIndent } from "common-tags";
 import { CustomClient } from "../../../structures/CustomClient";
+import { DatabaseManager } from "../../../managers/DatabaseManager";
+import Plugin from "../../../database/entities/Plugin";
 import os from "os";
 
 export default class extends BaseCommand {
@@ -30,6 +32,35 @@ export default class extends BaseCommand {
 				oneLine`The bot wasn't configured correctly!
 				Contact one of the developers about this issue.`
 			);
+		}
+
+		// Attempts to find dailies version
+		let dailiesVersion = "???";
+		try {
+			const connection = this.client.database.connection;
+			if (!connection) {
+				throw new Error(DatabaseManager.errorNoConnection);
+			}
+			const pluginId = "com.geekoverdrivestudio.dailies";
+			const pluginRepo = connection.getRepository(Plugin);
+			const plugin = await pluginRepo.findOne({
+				where: {
+					id: pluginId,
+				},
+			});
+			if (!plugin) {
+				throw new Error(
+					Utils.util.format(
+						DatabaseManager.errorNotFound,
+						"plugin",
+						pluginId
+					)
+				);
+			}
+
+			dailiesVersion = plugin.data.version as string;
+		} catch (error) {
+			Logger.error((error as Error).stack);
 		}
 
 		// For debugging
@@ -59,11 +90,14 @@ export default class extends BaseCommand {
 				- OS/Arch:      ${osArch}
 				- Environment:  ${nodeEnvironment}
 				${codeblock}${codeblock}yml
-				Bot:
+				Framed.js Bot:
 				- Uptime:       ${uptimeText}
 				- RAM Usage:    ${ramUsageText} MiB
+				- Back-End:     ${backEnd}
 				- Bot Version:  ${botVersion}
-				- Framed.js:    ${backEnd}
+				${codeblock}${codeblock}yml
+				Dailies Bot:
+				- Bot Version:  v${dailiesVersion}
 				${codeblock}
 				`);
 			await msg.discord.channel.send({ embeds: [embed] });
