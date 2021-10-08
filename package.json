@@ -44,7 +44,7 @@
     "winston": "^3.3.3"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "homepage": "https://github.com/some1chan/gdu-bot#readme",
   "devDependencies": {
