@@ -1,19 +1,23 @@
 # ----------------
 # Build stage
 # ----------------
-FROM node:15-alpine as build-stage
+FROM node:16-alpine as build-stage
 WORKDIR /app
 
 # Installs pnpm
 RUN npm i -g pnpm
+
+# Installs sqlite3 prerequisite
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3
 
 # Copies pnpm deps
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 
 # Installs modules
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python 
 RUN pnpm install 
+
+# Deletes prerequisite
 RUN apk del .build-deps
 
 # Copy the rest of the files
@@ -25,7 +29,7 @@ RUN pnpm build
 # ----------------
 # Production stage
 # ----------------
-FROM node:15-alpine as production-stage
+FROM node:16-alpine as production-stage
 WORKDIR /app
 
 # Installs pnpm
@@ -36,7 +40,7 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 
 # Installs modules for the final time
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python 
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3
 RUN pnpm install --production 
 RUN apk del .build-deps
 
