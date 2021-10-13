@@ -32,6 +32,7 @@ const data: HelpData[] = [
 			"streaks all",
 			"streaks top",
 			"togglewarnings",
+			"vacation",
 		],
 	},
 	{
