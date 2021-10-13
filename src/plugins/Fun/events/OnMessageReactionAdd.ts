@@ -133,12 +133,7 @@ export default class extends BaseEvent {
 			parsedResults?.pollOptions.includes("one") ||
 			parsedResults?.pollOptions.includes("single");
 
-		const isPollCommand =
-			reactionMessage.content.startsWith(commandRan) ||
-			reactionMessage.content.startsWith("poll:") ||
-			isPollEmbed;
-
-		if (isPollCommand && singleVoteOnly) {
+		if (singleVoteOnly) {
 			// Gets cached users from reactions
 			const fetches = [];
 			for (const extraReaction of reaction.message.reactions.cache) {
