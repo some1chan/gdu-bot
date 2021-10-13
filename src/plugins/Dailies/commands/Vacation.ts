@@ -7,7 +7,6 @@ export default class extends BaseCommand {
 			id: "vacation",
 			defaultPrefix: "!",
 			about: "Toggle vacation mode.",
-			usage: "<required param> [optional param]",
 			description: oneLine`
 			Toggles vacation mode, where your streak gets locked.
 			This command prevents your streak from being lost,
