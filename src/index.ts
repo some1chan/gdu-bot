@@ -171,6 +171,7 @@ async function start() {
 					],
 					partials: ["MESSAGE", "CHANNEL", "REACTION", "USER"],
 					makeCache: Discord.Options.cacheWithLimits({
+						...Discord.Options.createDefault(),
 						MessageManager: 50,
 						PresenceManager: 0,
 					}),
