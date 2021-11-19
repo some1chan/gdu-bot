@@ -17,11 +17,6 @@ import { CustomClient } from "../../../structures/CustomClient";
 
 const data: HelpData[] = [
 	{
-		group: "Info",
-		// TODO: Sorting alphabetically should probably be done programatically
-		commands: ["about", "help", "ping"],
-	},
-	{
 		group: "Dailies",
 		commands: [
 			"alert",
