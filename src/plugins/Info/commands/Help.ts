@@ -44,7 +44,6 @@ export default class Help extends BaseCommand {
 			usage: "[command]",
 			examples: stripIndents`
 			\`{{prefix}}{{id}}\`
-			\`{{prefix}}{{id}} poll\`
 			\`{{prefix}}{{id}} dailies\`
 			`,
 			inline: true,
