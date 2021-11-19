@@ -52,18 +52,14 @@ export default class extends BaseEvent {
 
 	async build(): Promise<void> {
 		const help = await BaseMessage.format(
-			`$(command default.bot.info help) | `,
+			`$(command default.bot.info help)`,
 			this.client,
 			{
 				id: "default",
 				platform: "none",
 			}
 		);
-		const names = [
-			`${help}Managing Streaks`,
-			`${help}Testing Things`,
-			`${help}Fixing "Features"`,
-		];
+		const names = [`${help} and -help`];
 
 		names.forEach(name => {
 			this.presences.push({
