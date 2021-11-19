@@ -11,7 +11,7 @@ export default class extends BasePlugin {
 			version: "0.1.0",
 			paths: {
 				commands: path.join(__dirname, "commands"),
-				events: path.join(__dirname, "events"),
+				// events: path.join(__dirname, "events"),
 			},
 			groupEmote: "😛",
 			groupName: "Fun",

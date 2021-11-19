@@ -134,7 +134,6 @@ async function start() {
 		},
 		footer: [
 			"$(command default.bot.info help)",
-			"$(command default.bot.fun poll)",
 			"$(command com.geekoverdrivestudio.dailies dailies)",
 		],
 	});

@@ -35,14 +35,6 @@ const data: HelpData[] = [
 			"vacation",
 		],
 	},
-	{
-		group: "Fun",
-		commands: ["8ball", "poll"],
-	},
-	{
-		group: "Manage",
-		commands: ["suggest"],
-	},
 ];
 
 export default class Help extends BaseCommand {
