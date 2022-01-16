@@ -13,7 +13,6 @@ export default class Link extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "link",
-			prefixes: ["d."],
 			aliases: ["discohook", "discohookembed", "embed", "lnk", "restore"],
 			about: "Recreates a Discord message into Discohook.",
 			usage: "[id|link|content]",

@@ -16,7 +16,6 @@ export default class Raw extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "raw",
-			prefixes: ["d."],
 			about: "Escapes all markdown in a message.",
 			description: oneLine`
 			Escapes all markdown in a message, including code blocks,

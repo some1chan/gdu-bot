@@ -7,7 +7,6 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "rawfile",
-			prefixes: ["d."],
 			about:
 				"Escapes all markdown in a message, but stores the results into a file.",
 			usage: "[id|link|content]",

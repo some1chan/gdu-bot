@@ -14,7 +14,6 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "user",
-			prefixes: ["d."],
 			about: "Gets the user for Discord markdown formatting.",
 			description: oneLine`
 			Gets the user for Discord markdown formatting.

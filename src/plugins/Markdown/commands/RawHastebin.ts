@@ -7,7 +7,6 @@ export default class extends BaseCommand {
 	constructor(plugin: BasePlugin) {
 		super(plugin, {
 			id: "rawhastebin",
-			prefixes: ["d."],
 			aliases: ["rawhb"],
 			about:
 				"Escapes all markdown in a message, but stores the results into a file.",
