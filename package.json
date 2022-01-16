@@ -5,10 +5,11 @@
     "typeorm": "node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./ormconfig.js",
     "build": "tsc --build",
     "build:watch": "tsc --build --watch",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
     "start": "node -r dotenv/config dist/index.js",
-    "dev": "tsnd -r dotenv/config --transpile-only --respawn ./src/index.ts --rs --deps"
+    "dev:/1": "echo 'format: tsnd [node-dev|ts-node flags] [tsnd-flags] [node cli flags] [--] [script] [script args]'",
+    "dev:/2": "echo 'Everything is separated in that order:'",
+    "dev": "tsnd --respawn --transpile-only --rs -- ./src/index.ts",
+    "madge": "madge -c --warning ./"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",
-    "@framedjs/core": "0.6.0",
+    "@framedjs/core": "0.9.0-next.5",
     "axios": "^0.21.4",
     "colors": "^1.4.0",
     "common-tags": "^1.8.2",
@@ -53,6 +54,7 @@
     "@types/koa-router": "^7.4.4",
     "@types/node-emoji": "^1.8.1",
     "@types/node-schedule": "^1.3.2",
+    "madge": "^5.0.1",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.4"
   },

@@ -23,17 +23,17 @@ export default class extends BaseCommand {
 				.setTitle("About the Bot")
 				.setDescription(
 					stripIndent`
-				${oneLine`${msg.discord?.client.user} is a collection of custom bots for
-				<:gdu:766718483983368212> **Game Dev Underground**.`}
-				`
+					${oneLine`${msg.discord?.client.user} is a collection of custom bots for
+					<:gdu:766718483983368212> **Game Dev Underground!** These are open source,
+					and you can find the source code by viewing the bot's profile.`}`
 				)
 				.addField(
 					"Authors",
 					stripIndent`
-				<@200340393596944384> - General Bot Back-End, Design
-				<@359521958519504926> - Dailies Bot
-				<@150649616772235264> - Advising, API, RegEx
-				`
+					<@200340393596944384> - General Bot Back-End, Design
+					<@359521958519504926> - Dailies Bot
+					<@150649616772235264> - Advising, API, RegEx
+					`
 				);
 			// .addField(
 			// 	"Special Thanks",

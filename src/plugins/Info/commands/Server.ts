@@ -84,7 +84,7 @@ export default class extends BaseCommand {
 							`${guild.roles.cache.size}`,
 							true
 						)
-						.addField("Created", `<t:${unix}>, `, true);
+						.addField("Created", `<t:${unix}>`, true);
 					// .addField(
 					// 	"Roles",
 					// 	oneLineCommaLists`${Array.from(

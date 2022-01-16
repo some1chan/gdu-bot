@@ -110,10 +110,10 @@ export default class extends BaseCommand {
 				this,
 				await msg.getPlace()
 			);
-			embed.setFooter(
-				`${existingFooterText}\n${newFooterText}`,
-				embed.footer?.iconURL
-			);
+			embed.setFooter({
+				text: `${existingFooterText}\n${newFooterText}`,
+				iconURL: embed.footer?.iconURL
+			});
 
 			try {
 				await msg.discord.channel.send({ embeds: [embed] });

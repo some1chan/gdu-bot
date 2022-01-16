@@ -325,8 +325,8 @@ export default class Raw extends BaseCommand {
 	 */
 	static async getMessageFromSnowflake(
 		snowflake: string,
-		channels: Discord.Channel[],
-		commandChannel: Discord.TextBasedChannels
+		channels: Discord.AnyChannel[],
+		commandChannel: Discord.TextBasedChannel
 	): Promise<Discord.Message | undefined> {
 		let newMsg: Discord.Message | undefined;
 		if (snowflake) {
@@ -336,7 +336,7 @@ export default class Raw extends BaseCommand {
 
 				// If the channel is a DM, and the message being found
 				// isn't the same place, the message shouldn't be leaked
-				const channel = element as Discord.TextBasedChannels;
+				const channel = element as Discord.TextBasedChannel;
 				if (
 					commandChannel.type == "DM" &&
 					commandChannel.id != channel.id

@@ -152,10 +152,10 @@ export default class extends BasePlugin {
 			);
 
 			// Workaround to make dailies bot not freak out when the icon_url doesn't exist
-			embed.setFooter(
-				`${embed.footer?.text ?? ""}`,
-				embed.footer?.iconURL ?? ""
-			);
+			embed.setFooter({
+				text: `${embed.footer?.text ?? ""}`,
+				iconURL: embed.footer?.iconURL ?? "",
+			});
 
 			const json = JSON.stringify(embed);
 

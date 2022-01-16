@@ -7,7 +7,7 @@ export default class extends BaseRouter {
 
 		this.router.get("/api/v0/discord/embedtemplate", async ctx => {
 			// const footerUrl = ctx.query.footerUrl || "";
-			const commandUsed = ctx.query.commandUsed as string || "";
+			const commandUsed = (ctx.query.commandUsed as string) || "";
 
 			const guild = this.client.discord?.client?.guilds.cache.get(
 				process.env.MAIN_GUILD_ID ?? ""
@@ -42,10 +42,10 @@ export default class extends BaseRouter {
 			);
 
 			// Workaround to make dailies bot not freak out when the icon_url doesn't exist
-			embed.setFooter(
-				`${embed.footer?.text ?? ""}`,
-				embed.footer?.iconURL ?? ""
-			);
+			embed.setFooter({
+				text: `${embed.footer?.text ?? ""}`,
+				iconURL: embed.footer?.iconURL ?? "",
+			});
 
 			const json = JSON.stringify(embed);
 

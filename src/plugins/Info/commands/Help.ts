@@ -4,7 +4,6 @@ import {
 	BaseMessage,
 	BasePlugin,
 	Discord,
-	DiscordMessage,
 	EmbedHelper,
 	HelpData,
 	FriendlyError,
@@ -16,6 +15,10 @@ import { oneLine, oneLineInlineLists, stripIndents } from "common-tags";
 import { CustomClient } from "../../../structures/CustomClient";
 
 const data: HelpData[] = [
+	{
+		group: "Info",
+		commands: ["about", "achievements", "server"],
+	},
 	{
 		group: "Dailies",
 		commands: [

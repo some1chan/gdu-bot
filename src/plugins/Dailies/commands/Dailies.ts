@@ -85,15 +85,16 @@ export default class extends BaseCommand {
 				const existingFooterText = embed.footer?.text
 					? embed.footer.text
 					: "";
-				const newFooterText = this.client.formatting.formatCommandNotation(
-					`Page ${pageNum}/${max} - Use {{prefix}}{{id}} [page number] to access a new page.`,
-					this,
-					await msg.getPlace()
-				);
-				embed.setFooter(
-					`${existingFooterText}\n${newFooterText}`,
-					embed.footer?.iconURL
-				);
+				const newFooterText =
+					this.client.formatting.formatCommandNotation(
+						`Page ${pageNum}/${max} - Use {{prefix}}{{id}} [page number] to access a new page.`,
+						this,
+						await msg.getPlace()
+					);
+				embed.setFooter({
+					text: `${existingFooterText}\n${newFooterText}`,
+					iconURL: embed.footer?.iconURL,
+				});
 				await msg.discord.channel.send({ embeds: [embed] });
 				return true;
 			}

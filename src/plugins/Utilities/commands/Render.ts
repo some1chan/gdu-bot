@@ -78,7 +78,7 @@ export default class extends BaseCommand {
 			}
 
 			let channelOrMessage:
-				| Discord.TextBasedChannels
+				| Discord.TextBasedChannel
 				| Discord.Message
 				| undefined;
 
