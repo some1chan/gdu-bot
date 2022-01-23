@@ -25,7 +25,7 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "@framedjs/core": "0.9.2",
     "axios": "^0.21.4",
-    "colors": "^1.4.0",
+    "colors": "1.4.0",
     "common-tags": "^1.8.2",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.6.0",
