@@ -7,6 +7,7 @@ import {
 } from "@framedjs/core";
 import { oneLine, stripIndents } from "common-tags";
 import ModerationPlugin from "../Moderation.plugin";
+import * as AuditLogValidity from "../utils/AuditLogValidity";
 
 export default class extends BaseEvent {
 	plugin!: ModerationPlugin;
@@ -79,7 +80,7 @@ export default class extends BaseEvent {
 				let string =
 					executor && executor.id != newMember.id
 						? `, by ${executor}`
-						: ", but we don't know who.";
+						: ", by a moderator";
 				embed.addField(
 					"Info",
 					oldMember.nickname != null && newMember.nickname != null
@@ -163,13 +164,20 @@ export default class extends BaseEvent {
 					.setTimestamp();
 
 				const me = guild.me;
+				let failedFetch = true;
 				if (me?.permissions.has("VIEW_AUDIT_LOG")) {
 					const fetchedLogs = await guild.fetchAuditLogs({
-						limit: 1,
+						// limit: 1,
 						type: "MEMBER_UPDATE",
 					});
-					const updateLog = fetchedLogs.entries.first();
-					if (updateLog) {
+					const updateLog = AuditLogValidity.getValidAuditLog(
+						fetchedLogs as unknown as Discord.GuildAuditLogs<"ALL">,
+						newMember.id
+					);
+					if (
+						updateLog?.target &&
+						updateLog.target.id == newMember.id
+					) {
 						embed
 							.addField(
 								"Info",
@@ -179,8 +187,11 @@ export default class extends BaseEvent {
 								text: stripIndents`User ID: ${newMember.id}
 								Moderator user ID: ${updateLog.executor?.id}`,
 							});
+						failedFetch = false;
 					}
-				} else {
+				}
+
+				if (failedFetch) {
 					embed
 						.addField(
 							"Info",

@@ -7,6 +7,7 @@ import {
 } from "@framedjs/core";
 import { oneLine, stripIndents } from "common-tags";
 import ModerationPlugin from "../Moderation.plugin";
+import * as AuditLogValidity from "../utils/AuditLogValidity";
 
 export default class extends BaseEvent {
 	plugin!: ModerationPlugin;
@@ -39,19 +40,20 @@ export default class extends BaseEvent {
 				const channel = await this.plugin.getModLogChannel(guild);
 
 				const fetchedLogs = await guild.fetchAuditLogs({
-					limit: 1,
+					limit: 3,
 					type: "MEMBER_KICK",
 				});
-				const kickLog = fetchedLogs.entries.first();
-
+				const kickLog = AuditLogValidity.getValidAuditLog(
+					fetchedLogs as unknown as Discord.GuildAuditLogs<"ALL">,
+					member.id
+				);
 				if (!kickLog) {
 					return;
 				}
 
-				const kickerText =
-					kickLog.target?.id == member.id
-						? ` by ${kickLog.executor}`
-						: `, but we don't know who`;
+				const kickerText = kickLog.executor
+					? ` by ${kickLog.executor}`
+					: ` by a moderator`;
 				let ban: Discord.GuildBan | undefined;
 				try {
 					ban = await guild.bans.fetch(member);

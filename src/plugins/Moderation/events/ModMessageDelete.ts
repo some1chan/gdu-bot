@@ -7,6 +7,7 @@ import {
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
 import ModerationPlugin from "../Moderation.plugin";
+import * as AuditLogValidity from "../utils/AuditLogValidity";
 
 export default class extends BaseEvent {
 	plugin!: ModerationPlugin;
@@ -89,14 +90,14 @@ export default class extends BaseEvent {
 		if (me?.permissions.has("VIEW_AUDIT_LOG")) {
 			if (!fetchedLogs) {
 				fetchedLogs = await guild.fetchAuditLogs({
-					limit: 1,
+					// limit: 1,
 					type: "MESSAGE_DELETE",
 				});
 			}
-			const deleteLog = fetchedLogs.entries.first();
-
-			// Check for bot executor, and stop code if it is a bot
-			if (deleteLog?.executor?.bot && rawCall) return;
+			const deleteLog = AuditLogValidity.getValidAuditLog(
+				fetchedLogs as unknown as Discord.GuildAuditLogs<"ALL">,
+				message.author?.id
+			);
 
 			if (deleteLog?.target?.id == message.author?.id) {
 				embedBase
@@ -109,7 +110,7 @@ export default class extends BaseEvent {
 					)
 					.setFooter({
 						text: `${embedBase.footer?.text}\nModerator user ID: ${
-							deleteLog?.target.id ?? "unknown"
+							deleteLog?.target?.id ?? "unknown"
 						}`,
 					});
 				failedToFetch = false;

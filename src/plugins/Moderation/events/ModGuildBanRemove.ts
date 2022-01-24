@@ -7,6 +7,7 @@ import {
 } from "@framedjs/core";
 import { oneLine, stripIndents } from "common-tags";
 import ModerationPlugin from "../Moderation.plugin";
+import * as AuditLogValidity from "../utils/AuditLogValidity";
 
 export default class extends BaseEvent {
 	plugin!: ModerationPlugin;
@@ -47,13 +48,16 @@ export default class extends BaseEvent {
 				.setTimestamp();
 
 			const me = guild.me;
-			let failedToFetch = true;
+			let failedFetch = true;
 			if (me?.permissions.has("VIEW_AUDIT_LOG")) {
 				const fetchedLogs = await guild.fetchAuditLogs({
-					limit: 1,
+					// limit: 1,
 					type: "MEMBER_BAN_REMOVE",
 				});
-				const updateLog = fetchedLogs.entries.first();
+				const updateLog = AuditLogValidity.getValidAuditLog(
+					fetchedLogs as unknown as Discord.GuildAuditLogs<"ALL">,
+					ban.user.id
+				);
 				if (updateLog?.target?.id == ban.user.id) {
 					embed
 						.addField(
@@ -64,20 +68,14 @@ export default class extends BaseEvent {
 							text: stripIndents`User ID: ${ban.user.id}
 							Moderator user ID: ${updateLog.executor?.id}`,
 						});
-					failedToFetch = false;
-				} else {
-					embed.addField(
-						"Info",
-						oneLine`:person_lifting_weights: User ${ban.user} was unbanned, but we don't know who unbanned.`
-					);
-					failedToFetch = false;
+					failedFetch = false;
 				}
 			}
 
-			if (failedToFetch) {
+			if (failedFetch) {
 				embed.addField(
 					"Info",
-					oneLine`:person_lifting_weights: User ${ban.user} was unbanned.`
+					oneLine`:person_lifting_weights: User ${ban.user} was unbanned by a moderator.`
 				);
 			}
 

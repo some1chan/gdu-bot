@@ -7,6 +7,7 @@ import {
 } from "@framedjs/core";
 import { oneLine } from "common-tags";
 import ModerationPlugin from "../Moderation.plugin";
+import * as AuditLogValidity from "../utils/AuditLogValidity";
 
 export default class extends BaseEvent {
 	plugin!: ModerationPlugin;

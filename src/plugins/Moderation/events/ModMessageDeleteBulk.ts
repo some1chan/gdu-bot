@@ -44,7 +44,7 @@ export default class extends BaseEvent {
 
 			if (!fetchedLogs) {
 				fetchedLogs = await message.guild.fetchAuditLogs({
-					limit: 1,
+					// limit: 1,
 					type: "MESSAGE_BULK_DELETE",
 				});
 			}
